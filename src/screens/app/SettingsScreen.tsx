@@ -1,20 +1,93 @@
+// import React from 'react';
+// import {View, Text, StyleSheet, Button} from 'react-native';
+// import {logoutThunk} from '../../features/auth/authThunk';
+// import {useAppDispatch} from '../../app/hooks';
+
+// const SettingsScreen = () => {
+//   const dispatch = useAppDispatch();
+
+//   const handleLogout = () => {
+//     dispatch(logoutThunk());
+//     // Optionally, add any additional logout logic (e.g., navigation, clearing tokens)
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.text}>Settings Screen</Text>
+//       <Button title="Logout" onPress={handleLogout} />
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//   },
+//   text: {
+//     fontSize: 18,
+//   },
+// });
+
+// export default SettingsScreen;
+
 import React from 'react';
-import {View, Text, StyleSheet, Button} from 'react-native';
-import {useDispatch} from 'react-redux';
-import {signOut} from '../../features/auth/authSlice';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // You can use other icon sets
+import {useNavigation} from '@react-navigation/native';
+import {logoutThunk} from '../../features/auth/authThunk';
+import {useAppDispatch} from '../../app/hooks';
+
+const menuItems = [
+  {
+    id: '1',
+    title: 'Add Accounts',
+    icon: 'wallet-outline',
+    screen: 'ProfileScreen',
+  },
+  {
+    id: '2',
+    title: 'Categories',
+    icon: 'pricetags-outline',
+    screen: 'CategoryScreen',
+  },
+];
 
 const SettingsScreen = () => {
-  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    dispatch(signOut());
-    // Optionally, add any additional logout logic (e.g., navigation, clearing tokens)
+  const handleNavigate = (screen: string) => {
+    navigation.navigate(screen as never); // adjust typing if needed
+  };
+
+  const handleLogout = async () => {
+    dispatch(logoutThunk());
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Settings Screen</Text>
-      <Button title="Logout" onPress={handleLogout} />
+      {menuItems.map(item => (
+        <TouchableOpacity
+          key={item.id}
+          style={styles.menuItem}
+          onPress={() => handleNavigate(item.screen)}>
+          <Icon name={item.icon} size={24} color="#333" style={styles.icon} />
+          <Text style={styles.text}>{item.title}</Text>
+        </TouchableOpacity>
+      ))}
+
+      {/* Logout button */}
+      <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+        <Icon
+          name="log-out-outline"
+          size={24}
+          color="#d00"
+          style={styles.icon}
+        />
+        <Text style={[styles.text, {color: '#d00'}]}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -22,11 +95,18 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    padding: 20,
+  },
+  menuItem: {
+    flexDirection: 'row',
     alignItems: 'center',
+    paddingVertical: 15,
+  },
+  icon: {
+    marginRight: 15,
   },
   text: {
-    fontSize: 18,
+    fontSize: 16,
   },
 });
 

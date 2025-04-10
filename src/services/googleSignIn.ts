@@ -12,7 +12,7 @@ export const signInWithGoogle = async () => {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
     const idToken = userInfo.data?.idToken;
-    
+
     const {data, error} = await supabase.auth.signInWithIdToken({
       provider: 'google',
       token: idToken!,
@@ -24,8 +24,6 @@ export const signInWithGoogle = async () => {
 
     return data.user;
   } catch (error: any) {
-    console.log('ERROR IS: ' + JSON.stringify(error));
-
     throw error;
   }
 };
