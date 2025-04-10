@@ -11,13 +11,12 @@ export const fetchAllCategoriesThunk = createAsyncThunk<
   string | null,
   {rejectValue: string}
 >('categories/fetchAll', async (userId, {rejectWithValue}) => {
-  
   // select all the categories with user_id or where user_id is null
   // null user_id specifies the default categories
   const {data, error} = await supabase
     .from('categories')
     .select('*')
-    // .or(`user_id.eq.${userId},user_id.is.null`)
+    .or(`user_id.eq.${userId},user_id.is.null`)
     .order('created_at', {ascending: true});
   if (error) {
     return rejectWithValue(error.message);
