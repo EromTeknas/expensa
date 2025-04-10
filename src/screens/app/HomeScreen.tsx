@@ -3,14 +3,13 @@ import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import {fetchAllCategoriesThunk} from '../../features/categories/categoriesThunk';
-import {useAuth} from '../../features/auth/authHooks';
 import {fetchAllAccountsThunk} from '../../features/accounts/accountsThunk';
 
 const HomeScreen = () => {
   const [amount, setAmount] = useState('');
   const [selectedCategory, setSelectedCategory] = useState();
   const [selectedAccount, setSelectedAccount] = useState();
-  const {user} = useAuth();
+  const user = useAppSelector(state => state.auth.user);
   const dispatch = useAppDispatch();
   const {categories, categoriesLoading, categoriesError} = useAppSelector(
     state => state.categories,
@@ -27,8 +26,8 @@ const HomeScreen = () => {
 
   useEffect(() => {
     console.log(user);
-    dispatch(fetchAllCategoriesThunk(user.id));
-    dispatch(fetchAllAccountsThunk(user.id));
+    dispatch(fetchAllCategoriesThunk(user?.id!));
+    dispatch(fetchAllAccountsThunk(user?.id!));
   }, [dispatch, user]);
 
   return (
