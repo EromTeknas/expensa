@@ -1,22 +1,31 @@
 import React from 'react';
-import {View, Text, Button, ActivityIndicator} from 'react-native';
-import {useAuth} from '../features/auth/authHooks';
+import {View, Button, Text, ActivityIndicator} from 'react-native';
 import BottomTabs from '../navigation/BottomTabs';
+import {useAppDispatch, useAppSelector} from '../app/hooks';
+import {signInWithGoogleThunk} from '../features/auth/authThunk';
 
 const LoginScreen = () => {
-  const {signIn, loading, user, error} = useAuth();
+  const dispatch = useAppDispatch();
+  const {user, authLoading, authError} = useAppSelector(state => state.auth);
 
+  const handleLogin = async () => {
+    try {
+      dispatch(signInWithGoogleThunk());
+    } catch (error) {
+      console.log('Login Failed', error);
+    }
+  };
   if (user) {
     return <BottomTabs />;
   }
   return (
     <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      {loading ? (
+      {authLoading ? (
         <ActivityIndicator size="large" />
       ) : (
-        <Button title="Sign in with Google" onPress={signIn} />
+        <Button title="Sign in with Google" onPress={handleLogin} />
       )}
-      {error && <Text style={{color: 'red'}}>{error}</Text>}
+      {authError && <Text style={{color: 'red'}}>{authError}</Text>}
     </View>
   );
 };
