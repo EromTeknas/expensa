@@ -1,14 +1,24 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect, useState} from 'react';
-import {View, Text, TextInput, Button, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
 import {fetchAllCategoriesThunk} from '../../features/categories/categoriesThunk';
 import {fetchAllAccountsThunk} from '../../features/accounts/accountsThunk';
+import {
+  addExpenseThunk,
+  fetchAllExpensesThunk,
+} from '../../features/expenses/expensesThunk';
+import GroupedExpensesList from '../../components/GroupedExpensesList';
 
 const HomeScreen = () => {
-  const [amount, setAmount] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState();
-  const [selectedAccount, setSelectedAccount] = useState();
   const user = useAppSelector(state => state.auth.user);
   const dispatch = useAppDispatch();
   const {categories, categoriesLoading, categoriesError} = useAppSelector(
@@ -17,17 +27,43 @@ const HomeScreen = () => {
   const {accounts, accountsLoading, accountsError} = useAppSelector(
     state => state.accounts,
   );
+  const {expenses, expenseLoading, expenseError} = useAppSelector(
+    state => state.expenses,
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string>();
+  const [amount, setAmount] = useState('0');
+  const [selectedAccount, setSelectedAccount] = useState<string>();
+  const [description, setDescription] = useState('');
   // const [newCategory, setNewCategory] = useState('');
 
   const handleAddExpense = () => {
-    // Call your Redux/Supabase logic here
-    console.log({amount, selectedCategory, selectedAccount});
+    if (!selectedAccount && !selectedCategory) {
+      console.log(selectedAccount, selectedCategory, 'not selected');
+      return;
+    }
+
+    dispatch(
+      addExpenseThunk({
+        amount: amount,
+        user_id: user?.id!,
+        account_id: selectedAccount!,
+        category_id: selectedCategory!,
+        description: description,
+      }),
+    ).finally(() => {
+      setAmount('0');
+      setDescription('');
+    });
   };
 
   useEffect(() => {
-    console.log(user);
-    dispatch(fetchAllCategoriesThunk(user?.id!));
-    dispatch(fetchAllAccountsThunk(user?.id!));
+    dispatch(fetchAllCategoriesThunk(user?.id!)).then(() => {
+      setSelectedCategory(categories[0].id);
+    });
+    dispatch(fetchAllAccountsThunk(user?.id!)).then(() => {
+      setSelectedAccount(accounts[0].id);
+    });
+    dispatch(fetchAllExpensesThunk(user?.id!));
   }, [dispatch, user]);
 
   return (
@@ -99,7 +135,35 @@ const HomeScreen = () => {
           style={styles.input}
         />
       </View>
-      <Button title="Add Expense" onPress={handleAddExpense} />
+      <View
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          marginBottom: 16,
+        }}>
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          value={description}
+          onChangeText={setDescription}
+          placeholder="Description"
+          keyboardType="default"
+          style={styles.input}
+        />
+      </View>
+      <View>
+        <TouchableOpacity
+          style={[styles.button, expenseLoading && styles.disabledButton]}
+          onPress={handleAddExpense}
+          disabled={expenseLoading}>
+          {expenseLoading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Add Expense</Text>
+          )}
+        </TouchableOpacity>
+        {expenseError && <Text style={styles.errorText}>{expenseError}</Text>}
+      </View>
+      <GroupedExpensesList expenses={expenses} />
     </View>
   );
 };
@@ -107,9 +171,16 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  menuItem: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
   container: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
   label: {
     marginTop: 12,
@@ -147,5 +218,23 @@ const styles = StyleSheet.create({
   },
   radioTextSelected: {
     color: '#fff',
+  },
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 5,
+    fontSize: 12,
   },
 });
