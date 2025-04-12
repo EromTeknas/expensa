@@ -48,6 +48,7 @@ const accountsSlice = createSlice({
           id: action.payload.id!,
           name: action.payload.name!,
           user_id: action.payload.user_id!,
+          updated_at: action.payload.created_at!,
         };
         if (action.payload.created_at) {
           state.accounts.push(payload);
@@ -74,6 +75,7 @@ const accountsSlice = createSlice({
             id: action.payload.id!,
             name: action.payload.name!,
             user_id: action.payload.user_id!,
+            updated_at: action.payload.created_at!,
           };
           state.accounts[index] = payload;
         }

@@ -6,6 +6,26 @@ type Category = Database['public']['Tables']['categories']['Row'];
 type NewCategory = Database['public']['Tables']['categories']['Insert'];
 type UpdateCategory = Database['public']['Tables']['categories']['Update'];
 
+export const fetchCategoryById = createAsyncThunk<
+  Category,
+  string | null,
+  {rejectValue: string}
+>('categories/fetchById', async (category_id, {rejectWithValue}) => {
+  const {data, error} = await supabase
+    .from('categories')
+    .select('*')
+    .eq('id', category_id);
+  if (error) {
+    return rejectWithValue(error.message);
+  }
+
+  if (data.length) {
+    return data[0];
+  }
+
+  return rejectWithValue('No Category Found');
+});
+
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
   string | null,
@@ -21,7 +41,7 @@ export const fetchAllCategoriesThunk = createAsyncThunk<
   if (error) {
     return rejectWithValue(error.message);
   }
-  console.log(data);
+
   return data ?? [];
 });
 

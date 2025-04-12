@@ -21,7 +21,7 @@ export const fetchAllAccountsThunk = createAsyncThunk<
   if (error) {
     return rejectWithValue(error.message);
   }
-  console.log(data);
+
   return data ?? [];
 });
 

@@ -48,10 +48,11 @@ const categoriesSlice = createSlice({
           id: action.payload.id!,
           name: action.payload.name!,
           user_id: action.payload.user_id!,
+          updated_at: action.payload.created_at!,
         };
-        if (action.payload.created_at) {
-          state.categories.push(payload);
-        }
+
+        state.categories.push(payload);
+        state.categoriesLoading = false;
       })
       .addCase(addCategoryThunk.rejected, (state, action) => {
         state.categoriesError = action.payload ?? 'Failed to add category';
