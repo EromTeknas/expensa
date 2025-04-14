@@ -10,26 +10,18 @@ import {
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import {useAppDispatch, useAppSelector} from '../../app/hooks';
-import {fetchAllCategoriesThunk} from '../../features/categories/categoriesThunk';
-import {fetchAllAccountsThunk} from '../../features/accounts/accountsThunk';
+import {fetchAllCategoriesThunk} from '../../features/home/homeThunk';
+import {fetchAllAccountsThunk} from '../../features/home/homeThunk';
 import {
   addExpenseThunk,
   fetchAllExpensesThunk,
-} from '../../features/expenses/expensesThunk';
+} from '../../features/home/homeThunk';
 import GroupedExpensesList from '../../components/GroupedExpensesList';
 
 const HomeScreen = () => {
   const user = useAppSelector(state => state.auth.user);
   const dispatch = useAppDispatch();
-  const {categories, categoriesLoading, categoriesError} = useAppSelector(
-    state => state.categories,
-  );
-  const {accounts, accountsLoading, accountsError} = useAppSelector(
-    state => state.accounts,
-  );
-  const {expenses, expenseLoading, expenseError} = useAppSelector(
-    state => state.expenses,
-  );
+  const {category, account, expense} = useAppSelector(state => state.home);
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [amount, setAmount] = useState('0');
   const [selectedAccount, setSelectedAccount] = useState<string>();
@@ -64,17 +56,17 @@ const HomeScreen = () => {
 
   useEffect(() => {
     console.log('categories');
-    if (categories.length > 0) {
-      setSelectedCategory(categories[0].id);
+    if (category.categories.length > 0) {
+      setSelectedCategory(category.categories[0].id);
     }
-  }, [categories]);
+  }, [category.categories]);
 
   useEffect(() => {
     console.log('accounts');
-    if (accounts.length > 0) {
-      setSelectedAccount(accounts[0].id);
+    if (account.accounts.length > 0) {
+      setSelectedAccount(account.accounts[0].id);
     }
-  }, [accounts]);
+  }, [account.accounts]);
   return (
     <View style={styles.container}>
       <View
@@ -84,10 +76,10 @@ const HomeScreen = () => {
           flexDirection: 'row',
           gap: 16,
         }}>
-        {categoriesLoading ? (
+        {category.categoriesLoading ? (
           <Text>Loading...</Text>
-        ) : categoriesError ? (
-          <Text>{categoriesError}</Text>
+        ) : category.categoriesError ? (
+          <Text>{category.categoriesError}</Text>
         ) : (
           <View style={{display: 'flex', flex: 1, flexDirection: 'column'}}>
             <Text style={styles.label}>Category</Text>
@@ -96,26 +88,26 @@ const HomeScreen = () => {
                 selectedValue={selectedCategory}
                 onValueChange={currentCategoryName =>
                   setSelectedCategory(
-                    categories.find(
-                      category => category.name === currentCategoryName,
+                    category.categories.find(
+                      cat => cat.name === currentCategoryName,
                     )?.id,
                   )
                 }>
-                {categories.map(category => (
+                {category.categories.map(cat => (
                   <Picker.Item
-                    key={category.id}
-                    label={category.name ?? 'Unnamed'}
-                    value={category.name}
+                    key={cat.id}
+                    label={cat.name ?? 'Unnamed'}
+                    value={cat.name}
                   />
                 ))}
               </Picker>
             </View>
           </View>
         )}
-        {accountsLoading ? (
+        {account.accountsLoading ? (
           <Text>Loading...</Text>
-        ) : accountsError ? (
-          <Text>{accountsError}</Text>
+        ) : account.accountsError ? (
+          <Text>{account.accountsError}</Text>
         ) : (
           <View style={{display: 'flex', flex: 1, flexDirection: 'column'}}>
             <Text style={styles.label}>Account</Text>
@@ -124,16 +116,16 @@ const HomeScreen = () => {
                 selectedValue={selectedAccount}
                 onValueChange={currentAccountName =>
                   setSelectedAccount(
-                    accounts.find(
-                      account => account.name === currentAccountName,
+                    account.accounts.find(
+                      acc => acc.name === currentAccountName,
                     )?.id,
                   )
                 }>
-                {accounts.map(category => (
+                {account.accounts.map(acc => (
                   <Picker.Item
-                    key={category.id}
-                    label={category.name!}
-                    value={category.name}
+                    key={acc.id}
+                    label={acc.name!}
+                    value={acc.name}
                   />
                 ))}
               </Picker>
@@ -173,18 +165,23 @@ const HomeScreen = () => {
       </View>
       <View>
         <TouchableOpacity
-          style={[styles.button, expenseLoading && styles.disabledButton]}
+          style={[
+            styles.button,
+            expense.expensesLoading && styles.disabledButton,
+          ]}
           onPress={handleAddExpense}
-          disabled={expenseLoading}>
-          {expenseLoading ? (
+          disabled={expense.expensesLoading}>
+          {expense.expensesLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
             <Text style={styles.buttonText}>Add Expense</Text>
           )}
         </TouchableOpacity>
-        {expenseError && <Text style={styles.errorText}>{expenseError}</Text>}
+        {expense.expensessError && (
+          <Text style={styles.errorText}>{expense.expensessError}</Text>
+        )}
       </View>
-      <GroupedExpensesList expenses={expenses} />
+      <GroupedExpensesList expenses={expense.expenses} />
     </View>
   );
 };
