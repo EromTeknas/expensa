@@ -36,7 +36,7 @@ const HomeScreen = () => {
 
     dispatch(
       addExpenseThunk({
-        amount: amount,
+        amount: parseFloat(amount),
         user_id: user?.id!,
         account_id: selectedAccount!,
         category_id: selectedCategory!,

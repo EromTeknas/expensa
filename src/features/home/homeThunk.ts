@@ -1,26 +1,20 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import {Database} from '../../../database.types';
-import {supabase} from '../../services/supbaseClient';
-type Category = Database['public']['Tables']['categories']['Row'];
-type Account = Database['public']['Tables']['categories']['Row'];
-type Expense = Database['public']['Tables']['expenses']['Row'];
-type EnrichedExpense = Omit<Expense, 'account_id' | 'category_id'> & {
-  account: Account;
-  category: Category;
-};
+import {Category, fetchAllCategories} from '../../models/categories';
+import {Account, fetchAllAccounts} from '../../models/accounts';
+import {
+  addExpense,
+  EnrichedExpense,
+  fetchAllExpenses,
+  NewExpense,
+} from '../../models/expenses';
 
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
   string | null,
   {rejectValue: string}
 >('home/fetchAllCategories', async (userId, {rejectWithValue}) => {
-  // select all the categories with user_id or where user_id is null
-  // null user_id specifies the default categories
-  const {data, error} = await supabase
-    .from('categories')
-    .select('*')
-    .or(`user_id.eq.${userId},user_id.is.null`)
-    .order('created_at', {ascending: true});
+  const {data, error} = await fetchAllCategories(userId!);
+
   if (error) {
     return rejectWithValue(error.message);
   }
@@ -33,13 +27,7 @@ export const fetchAllAccountsThunk = createAsyncThunk<
   string | null,
   {rejectValue: string}
 >('home/fetchAllAccounts', async (userId, {rejectWithValue}) => {
-  // select all the categories with user_id or where user_id is null
-  // null user_id specifies the default categories
-  const {data, error} = await supabase
-    .from('accounts')
-    .select('*')
-    .or(`user_id.eq.${userId},user_id.is.null`)
-    .order('created_at', {ascending: true});
+  const {data, error} = await fetchAllAccounts(userId!);
   if (error) {
     return rejectWithValue(error.message);
   }
@@ -52,19 +40,8 @@ export const fetchAllExpensesThunk = createAsyncThunk<
   string | null,
   {rejectValue: string}
 >('home/fetchAllExpenses', async (userId, {rejectWithValue}) => {
-  const {data, error} = await supabase
-    .from('expenses')
-    .select(
-      `
-  *,
-  account:account_id ( id, name ),
-  category:category_id ( id, name )
-`,
-    )
-    .eq('user_id', userId)
-    .order('created_at', {ascending: true});
+  const {data, error} = await fetchAllExpenses(userId!);
 
-  console.log(data);
   if (error) {
     return rejectWithValue(error.message);
   }
@@ -73,53 +50,22 @@ export const fetchAllExpensesThunk = createAsyncThunk<
 });
 
 export const addExpenseThunk = createAsyncThunk<
-  EnrichedExpense,
-  {
-    amount: string;
-    description: string;
-    user_id: string;
-    category_id: string;
-    account_id: string;
-  },
+  EnrichedExpense[],
+  NewExpense,
   {rejectValue: string}
->(
-  'home/addExpense',
-  async (
-    {amount, user_id, description, category_id, account_id},
-    {rejectWithValue},
-  ) => {
-    const expense = [amount, user_id, description, category_id, account_id];
-    console.log(expense);
-    const {data, error} = await supabase
-      .from('expenses')
-      .insert([{amount, user_id, description, category_id, account_id}])
-      .select()
-      .single();
+>('home/addExpense', async (newExpense: NewExpense, {rejectWithValue}) => {
+  const {error: addError} = await addExpense(newExpense);
 
-    if (error) {
-      console.log('add error', error);
-      return rejectWithValue(error.message);
-    }
+  if (addError) {
+    return rejectWithValue(addError.message ?? 'Failed to fetch expenses');
+  }
 
-    // After insert, fetch the full `account` and `category` data
-    const {data: enrichedExpense, error: fetchError} = await supabase
-      .from('expenses')
-      .select(
-        `
-      *,
-      account:account_id ( id, name ),
-      category:category_id ( id, name )
-      `,
-      )
-      .eq('id', data?.id) // Fetch the inserted record by ID
-      .single();
+  // After insert, fetch the full `account` and `category` data
+  const {data: allExpensesData, error: fetchAllExpensesError} =
+    await fetchAllExpenses(newExpense.user_id);
+  if (fetchAllExpensesError) {
+    return rejectWithValue(fetchAllExpensesError.message);
+  }
 
-    if (fetchError) {
-      console.log('fetch error', fetchError);
-
-      return rejectWithValue(fetchError.message);
-    }
-
-    return enrichedExpense;
-  },
-);
+  return allExpensesData ?? [];
+});

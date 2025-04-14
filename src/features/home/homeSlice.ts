@@ -94,19 +94,9 @@ const homeSlice = createSlice({
         state.expense.expensesLoading = true;
       })
       .addCase(addExpenseThunk.fulfilled, (state, action) => {
-        const expense = {
-          created_at: action.payload.created_at!,
-          id: action.payload.id!,
-          amount: action.payload.amount!,
-          user_id: action.payload.user_id!,
-          category: action.payload.category!,
-          account: action.payload.account!,
-          updated_at: action.payload.created_at!,
-          description: action.payload.description!,
-        };
         state.expense.expensesLoading = false;
 
-        state.expense.expenses.push(expense);
+        state.expense.expenses = action.payload;
       })
       .addCase(addExpenseThunk.rejected, (state, action) => {
         state.expense.expensesLoading = false;

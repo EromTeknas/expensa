@@ -1,37 +1,3 @@
-// import React from 'react';
-// import {View, Text, StyleSheet, Button} from 'react-native';
-// import {logoutThunk} from '../../features/auth/authThunk';
-// import {useAppDispatch} from '../../app/hooks';
-
-// const SettingsScreen = () => {
-//   const dispatch = useAppDispatch();
-
-//   const handleLogout = () => {
-//     dispatch(logoutThunk());
-//     // Optionally, add any additional logout logic (e.g., navigation, clearing tokens)
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.text}>Settings Screen</Text>
-//       <Button title="Logout" onPress={handleLogout} />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-//   text: {
-//     fontSize: 18,
-//   },
-// });
-
-// export default SettingsScreen;
-
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // You can use other icon sets
