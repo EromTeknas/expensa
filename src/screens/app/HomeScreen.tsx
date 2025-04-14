@@ -57,15 +57,24 @@ const HomeScreen = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchAllCategoriesThunk(user?.id!)).then(() => {
-      setSelectedCategory(categories[0].id);
-    });
-    dispatch(fetchAllAccountsThunk(user?.id!)).then(() => {
-      setSelectedAccount(accounts[0].id);
-    });
+    dispatch(fetchAllCategoriesThunk(user?.id!));
+    dispatch(fetchAllAccountsThunk(user?.id!));
     dispatch(fetchAllExpensesThunk(user?.id!));
   }, [dispatch, user]);
 
+  useEffect(() => {
+    console.log('categories');
+    if (categories.length > 0) {
+      setSelectedCategory(categories[0].id);
+    }
+  }, [categories]);
+
+  useEffect(() => {
+    console.log('accounts');
+    if (accounts.length > 0) {
+      setSelectedAccount(accounts[0].id);
+    }
+  }, [accounts]);
   return (
     <View style={styles.container}>
       <View
@@ -85,7 +94,13 @@ const HomeScreen = () => {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedCategory}
-                onValueChange={itemValue => setSelectedCategory(itemValue)}>
+                onValueChange={currentCategoryName =>
+                  setSelectedCategory(
+                    categories.find(
+                      category => category.name === currentCategoryName,
+                    )?.id,
+                  )
+                }>
                 {categories.map(category => (
                   <Picker.Item
                     key={category.id}
@@ -107,7 +122,13 @@ const HomeScreen = () => {
             <View style={styles.pickerContainer}>
               <Picker
                 selectedValue={selectedAccount}
-                onValueChange={itemValue => setSelectedAccount(itemValue)}>
+                onValueChange={currentAccountName =>
+                  setSelectedAccount(
+                    accounts.find(
+                      account => account.name === currentAccountName,
+                    )?.id,
+                  )
+                }>
                 {accounts.map(category => (
                   <Picker.Item
                     key={category.id}
