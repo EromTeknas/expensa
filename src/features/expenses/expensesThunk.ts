@@ -53,6 +53,8 @@ export const addExpenseThunk = createAsyncThunk<
     {amount, user_id, description, category_id, account_id},
     {rejectWithValue},
   ) => {
+    const expense = [amount, user_id, description, category_id, account_id];
+    console.log(expense);
     const {data, error} = await supabase
       .from('expenses')
       .insert([{amount, user_id, description, category_id, account_id}])
@@ -60,6 +62,7 @@ export const addExpenseThunk = createAsyncThunk<
       .single();
 
     if (error) {
+      console.log('add error', error);
       return rejectWithValue(error.message);
     }
 
@@ -71,12 +74,14 @@ export const addExpenseThunk = createAsyncThunk<
       *,
       account:account_id ( id, name ),
       category:category_id ( id, name )
-    `,
+      `,
       )
       .eq('id', data?.id) // Fetch the inserted record by ID
       .single();
 
     if (fetchError) {
+      console.log('fetch error', fetchError);
+
       return rejectWithValue(fetchError.message);
     }
 
