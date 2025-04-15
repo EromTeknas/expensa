@@ -1,18 +1,14 @@
 import {createSlice} from '@reduxjs/toolkit';
-import {Database} from '../../../database.types';
 import {
   addExpenseThunk,
   fetchAllAccountsThunk,
   fetchAllCategoriesThunk,
   fetchAllExpensesThunk,
 } from './homeThunk';
-type Category = Database['public']['Tables']['categories']['Row'];
-type Account = Database['public']['Tables']['categories']['Row'];
-type Expense = Database['public']['Tables']['expenses']['Row'];
-type EnrichedExpense = Omit<Expense, 'account_id' | 'category_id'> & {
-  account: Account;
-  category: Category;
-};
+import {Category} from '../../models/categories';
+import {Account} from '../../models/accounts';
+import {EnrichedExpense} from '../../models/expenses';
+
 type homeScreenState = {
   category: {
     categories: Category[];

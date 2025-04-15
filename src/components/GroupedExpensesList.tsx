@@ -1,15 +1,8 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
 import ExpenseCard from './ExpenseCard';
-import {Database} from '../../database.types';
+import { EnrichedExpense } from '../models/expenses';
 
-type Expense = Database['public']['Tables']['expenses']['Row'];
-type Category = Database['public']['Tables']['categories']['Row'];
-type Account = Database['public']['Tables']['categories']['Row'];
-type EnrichedExpense = Omit<Expense, 'account_id' | 'category_id'> & {
-  account: Account;
-  category: Category;
-};
 type GroupedExpenses = {
   title: string;
   total: number;

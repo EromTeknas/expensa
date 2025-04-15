@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // You can use other icon sets
 import {format} from 'date-fns';
-import {Database} from '../../database.types';
+import {EnrichedExpense} from '../models/expenses';
 export const categoryIconMap: {
   [key: string]: {iconName: string; color: string};
 } = {
@@ -15,16 +15,8 @@ export const categoryIconMap: {
   custom: {iconName: 'apps-outline', color: '#ECEFF1'}, // fallback
 };
 
-type Expense = Database['public']['Tables']['expenses']['Row'];
-type Category = Database['public']['Tables']['categories']['Row'];
-type Account = Database['public']['Tables']['categories']['Row'];
-type EnrichedExpense = Omit<Expense, 'account_id' | 'category_id'> & {
-  account: Account;
-  category: Category;
-};
 type Props = {
   expense: EnrichedExpense;
-  
 };
 
 const ExpenseCard: React.FC<Props> = ({expense}) => {
