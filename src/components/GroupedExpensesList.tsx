@@ -35,8 +35,15 @@ const GroupedExpensesList: React.FC<Props> = ({expenses}) => {
     {},
   );
 
-  const groupedArray = Object.values(grouped);
-
+  const groupedArray = Object.values(grouped)
+    .map(group => ({
+      ...group,
+      data: group.data.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      ),
+    }))
+    .sort((a, b) => new Date(b.title).getTime() - new Date(a.title).getTime());
   return (
     <View style={styles.container}>
       <FlatList
