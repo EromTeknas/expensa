@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import {
   View,
@@ -30,19 +29,13 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View
-        style={{
-          display: 'flex',
-          width: '100%',
-          flexDirection: 'row',
-          gap: 16,
-        }}>
+      <View style={styles.row}>
         {category.categoriesLoading ? (
           <Text>Loading...</Text>
         ) : category.categoriesError ? (
           <Text>{category.categoriesError}</Text>
         ) : (
-          <View style={{display: 'flex', flex: 1, flexDirection: 'column'}}>
+          <View style={styles.column}>
             <Text style={styles.label}>Category</Text>
             <View style={styles.pickerContainer}>
               <Picker
@@ -70,10 +63,11 @@ const HomeScreen = () => {
         ) : account.accountsError ? (
           <Text>{account.accountsError}</Text>
         ) : (
-          <View style={{display: 'flex', flex: 1, flexDirection: 'column'}}>
+          <View style={styles.column}>
             <Text style={styles.label}>Account</Text>
             <View style={styles.pickerContainer}>
               <Picker
+                style={styles.picker}
                 selectedValue={selectedAccount}
                 onValueChange={currentAccountName =>
                   setSelectedAccount(
@@ -94,12 +88,8 @@ const HomeScreen = () => {
           </View>
         )}
       </View>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          marginBottom: 16,
-        }}>
+
+      <View style={styles.inputGroup}>
         <Text style={styles.label}>Amount</Text>
         <TextInput
           value={amount}
@@ -109,12 +99,8 @@ const HomeScreen = () => {
           style={styles.input}
         />
       </View>
-      <View
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          marginBottom: 16,
-        }}>
+
+      <View style={styles.inputGroup}>
         <Text style={styles.label}>Description</Text>
         <TextInput
           value={description}
@@ -124,6 +110,7 @@ const HomeScreen = () => {
           style={styles.input}
         />
       </View>
+
       <View>
         <TouchableOpacity
           style={[
@@ -142,6 +129,7 @@ const HomeScreen = () => {
           <Text style={styles.errorText}>{expense.expensessError}</Text>
         )}
       </View>
+
       <GroupedExpensesList expenses={expense.expenses} />
     </View>
   );
@@ -150,21 +138,39 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  menuItem: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-  },
   container: {
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
   },
+  row: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 16,
+  },
+  column: {
+    flex: 1,
+    flexDirection: 'column',
+  },
   label: {
     marginTop: 12,
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  pickerContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    marginTop: 4,
+    height: 36, // reduce overall height
+    justifyContent: 'center',
+  },
+  picker: {
+    fontSize: 10, // smaller text
+  },
+  inputGroup: {
+    flexDirection: 'column',
+    marginBottom: 16,
   },
   input: {
     borderColor: '#ccc',
@@ -172,31 +178,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     marginTop: 4,
-  },
-  pickerContainer: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginTop: 4,
-    overflow: 'hidden',
-  },
-  radioButton: {
-    padding: 10,
-    marginRight: 10,
-    borderWidth: 1,
-    borderRadius: 20,
-    borderColor: '#ccc',
-    marginTop: 8,
-  },
-  radioButtonSelected: {
-    backgroundColor: '#2196F3',
-    borderColor: '#2196F3',
-  },
-  radioText: {
-    color: '#333',
-  },
-  radioTextSelected: {
-    color: '#fff',
   },
   button: {
     backgroundColor: '#007AFF',
