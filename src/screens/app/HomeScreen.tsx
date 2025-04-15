@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -9,64 +9,25 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
-import {useAppDispatch, useAppSelector} from '../../app/hooks';
-import {fetchAllCategoriesThunk} from '../../features/home/homeThunk';
-import {fetchAllAccountsThunk} from '../../features/home/homeThunk';
-import {
-  addExpenseThunk,
-  fetchAllExpensesThunk,
-} from '../../features/home/homeThunk';
 import GroupedExpensesList from '../../components/GroupedExpensesList';
+import {useHomeScreen} from '../../hooks/useHomeScreen';
 
 const HomeScreen = () => {
-  const user = useAppSelector(state => state.auth.user);
-  const dispatch = useAppDispatch();
-  const {category, account, expense} = useAppSelector(state => state.home);
-  const [selectedCategory, setSelectedCategory] = useState<string>();
-  const [amount, setAmount] = useState('0');
-  const [selectedAccount, setSelectedAccount] = useState<string>();
-  const [description, setDescription] = useState('');
-  // const [newCategory, setNewCategory] = useState('');
+  const {
+    category,
+    account,
+    expense,
+    selectedCategory,
+    setSelectedCategory,
+    selectedAccount,
+    setSelectedAccount,
+    amount,
+    setAmount,
+    description,
+    setDescription,
+    handleAddExpense,
+  } = useHomeScreen();
 
-  const handleAddExpense = () => {
-    if (!selectedAccount && !selectedCategory) {
-      console.log(selectedAccount, selectedCategory, 'not selected');
-      return;
-    }
-
-    dispatch(
-      addExpenseThunk({
-        amount: parseFloat(amount),
-        user_id: user?.id!,
-        account_id: selectedAccount!,
-        category_id: selectedCategory!,
-        description: description,
-      }),
-    ).finally(() => {
-      setAmount('0');
-      setDescription('');
-    });
-  };
-
-  useEffect(() => {
-    dispatch(fetchAllCategoriesThunk(user?.id!));
-    dispatch(fetchAllAccountsThunk(user?.id!));
-    dispatch(fetchAllExpensesThunk(user?.id!));
-  }, [dispatch, user]);
-
-  useEffect(() => {
-    console.log('categories');
-    if (category.categories.length > 0) {
-      setSelectedCategory(category.categories[0].id);
-    }
-  }, [category.categories]);
-
-  useEffect(() => {
-    console.log('accounts');
-    if (account.accounts.length > 0) {
-      setSelectedAccount(account.accounts[0].id);
-    }
-  }, [account.accounts]);
   return (
     <View style={styles.container}>
       <View
