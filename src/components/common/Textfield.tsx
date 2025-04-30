@@ -49,8 +49,8 @@ const Textfield = ({
   suffixIcon,
   onChangeText,
   keyboardType,
-  multiline = true,
-  numberOfLines = 5,
+  multiline,
+  numberOfLines,
 }: TextfieldProps) => {
   const [type, setType] = useState(TEXTFIELD_TYPE.INACTIVE);
 
@@ -67,7 +67,7 @@ const Textfield = ({
           />
         )}
         <TextInput
-          style={getInputStyles(size, type, numberOfLines)}
+          style={getInputStyles(size, type, numberOfLines ?? 0)}
           placeholder={placeholder}
           placeholderTextColor={COLORS.grey[200]}
           value={value}
@@ -98,7 +98,7 @@ export default Textfield;
 const getIconStyle = (size: TEXTFIELD_SIZE): ViewStyle => {
   const marginTop =
     size === TEXTFIELD_SIZE.SMALL
-      ? 10
+      ? 14
       : size === TEXTFIELD_SIZE.MEDIUM
       ? 14
       : 18;
@@ -145,7 +145,9 @@ const getInputStyles = (
   numberOfLines: number,
 ): TextStyle => {
   const fontSize =
-    size === TEXTFIELD_SIZE.SMALL || size === TEXTFIELD_SIZE.MEDIUM
+    size === TEXTFIELD_SIZE.SMALL
+      ? getFontSize(14)
+      : size === TEXTFIELD_SIZE.MEDIUM
       ? getFontSize(16)
       : getFontSize(18);
   const TEXTAREA_HEIGHT = numberOfLines * fontSize;
@@ -158,7 +160,7 @@ const getInputStyles = (
     color: fontColor,
     flex: 1,
     borderWidth: 0,
-    height: TEXTAREA_HEIGHT,
+    height: TEXTAREA_HEIGHT === 0 ? 'auto' : TEXTAREA_HEIGHT,
   };
 };
 

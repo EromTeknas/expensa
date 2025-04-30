@@ -28,8 +28,8 @@ const HomeScreen = () => {
     setSelectedAccount,
     amount,
     setAmount,
-    // description,
-    // setDescription,
+    description,
+    setDescription,
     handleAddExpense,
   } = useHomeScreen();
 
@@ -118,6 +118,16 @@ const HomeScreen = () => {
             prefixIcon={'invert-mode-outline'}
             onChangeText={amt => setAmount(amt)}
             keyboardType={'number-pad'}
+          />
+          <Textfield
+            value={description}
+            size={TEXTFIELD_SIZE.SMALL}
+            placeholder={'Enter Description'}
+            label={'Description'}
+            prefixIcon={'invert-mode-outline'}
+            onChangeText={des => setDescription(des)}
+            multiline={true}
+            numberOfLines={5}
           />
           <View>
             <TouchableOpacity
