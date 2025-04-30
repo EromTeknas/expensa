@@ -6,10 +6,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import GroupedExpensesList from '../../components/GroupedExpensesList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
+import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
+import COLORS from '../../constants/colors';
 
 const HomeScreen = () => {
   const {
@@ -22,116 +28,120 @@ const HomeScreen = () => {
     setSelectedAccount,
     amount,
     setAmount,
-    description,
-    setDescription,
+    // description,
+    // setDescription,
     handleAddExpense,
   } = useHomeScreen();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.row}>
-        {category.categoriesLoading ? (
-          <Text>Loading...</Text>
-        ) : category.categoriesError ? (
-          <Text>{category.categoriesError}</Text>
-        ) : (
-          <View style={styles.column}>
-            <Text style={styles.label}>Category</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                selectedValue={selectedCategory}
-                onValueChange={currentCategoryName =>
-                  setSelectedCategory(
-                    category.categories.find(
-                      cat => cat.name === currentCategoryName,
-                    )?.id,
-                  )
-                }>
-                {category.categories.map(cat => (
-                  <Picker.Item
-                    key={cat.id}
-                    label={cat.name ?? 'Unnamed'}
-                    value={cat.name}
-                  />
-                ))}
-              </Picker>
-            </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <View style={styles.container}>
+          <View style={styles.row}>
+            {category.categoriesLoading ? (
+              <Text>Loading...</Text>
+            ) : category.categoriesError ? (
+              <Text>{category.categoriesError}</Text>
+            ) : (
+              <View style={styles.column}>
+                <Text style={styles.label}>Category</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={selectedCategory}
+                    onValueChange={currentCategoryName =>
+                      setSelectedCategory(
+                        category.categories.find(
+                          cat => cat.name === currentCategoryName,
+                        )?.id,
+                      )
+                    }>
+                    {category.categories.map(cat => (
+                      <Picker.Item
+                        key={cat.id}
+                        label={cat.name ?? 'Unnamed'}
+                        value={cat.name}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            )}
+            {account.accountsLoading ? (
+              <Text>Loading...</Text>
+            ) : account.accountsError ? (
+              <Text>{account.accountsError}</Text>
+            ) : (
+              <View style={styles.column}>
+                <Text style={styles.label}>Account</Text>
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    style={styles.picker}
+                    selectedValue={selectedAccount}
+                    onValueChange={currentAccountName =>
+                      setSelectedAccount(
+                        account.accounts.find(
+                          acc => acc.name === currentAccountName,
+                        )?.id,
+                      )
+                    }>
+                    {account.accounts.map(acc => (
+                      <Picker.Item
+                        key={acc.id}
+                        label={acc.name!}
+                        value={acc.name}
+                      />
+                    ))}
+                  </Picker>
+                </View>
+              </View>
+            )}
           </View>
-        )}
-        {account.accountsLoading ? (
-          <Text>Loading...</Text>
-        ) : account.accountsError ? (
-          <Text>{account.accountsError}</Text>
-        ) : (
-          <View style={styles.column}>
-            <Text style={styles.label}>Account</Text>
-            <View style={styles.pickerContainer}>
-              <Picker
-                style={styles.picker}
-                selectedValue={selectedAccount}
-                onValueChange={currentAccountName =>
-                  setSelectedAccount(
-                    account.accounts.find(
-                      acc => acc.name === currentAccountName,
-                    )?.id,
-                  )
-                }>
-                {account.accounts.map(acc => (
-                  <Picker.Item
-                    key={acc.id}
-                    label={acc.name!}
-                    value={acc.name}
-                  />
-                ))}
-              </Picker>
-            </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Amount</Text>
+            <TextInput
+              value={amount}
+              onChangeText={setAmount}
+              placeholder="Enter amount"
+              keyboardType="numeric"
+              style={styles.input}
+            />
           </View>
-        )}
-      </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Amount</Text>
-        <TextInput
-          value={amount}
-          onChangeText={setAmount}
-          placeholder="Enter amount"
-          keyboardType="numeric"
-          style={styles.input}
-        />
-      </View>
+          <Textfield
+            value={amount}
+            size={TEXTFIELD_SIZE.MEDIUM}
+            placeholder={'Enter Amount'}
+            label={'Amount'}
+            prefixIcon={'invert-mode-outline'}
+            onChangeText={amt => setAmount(amt)}
+            keyboardType={'number-pad'}
+          />
+          <View>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                expense.expensesLoading && styles.disabledButton,
+              ]}
+              onPress={handleAddExpense}
+              disabled={expense.expensesLoading}>
+              {expense.expensesLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Add Expense</Text>
+              )}
+            </TouchableOpacity>
+            {expense.expensessError && (
+              <Text style={styles.errorText}>{expense.expensessError}</Text>
+            )}
+          </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Description</Text>
-        <TextInput
-          value={description}
-          onChangeText={setDescription}
-          placeholder="Description"
-          keyboardType="default"
-          style={styles.input}
-        />
-      </View>
-
-      <View>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            expense.expensesLoading && styles.disabledButton,
-          ]}
-          onPress={handleAddExpense}
-          disabled={expense.expensesLoading}>
-          {expense.expensesLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Add Expense</Text>
-          )}
-        </TouchableOpacity>
-        {expense.expensessError && (
-          <Text style={styles.errorText}>{expense.expensessError}</Text>
-        )}
-      </View>
-
-      <GroupedExpensesList expenses={expense.expenses} />
-    </View>
+          <GroupedExpensesList expenses={expense.expenses} />
+        </View>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -142,6 +152,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
+    backgroundColor: COLORS.backgroundColor,
   },
   row: {
     flexDirection: 'row',

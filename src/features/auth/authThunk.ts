@@ -5,6 +5,7 @@ import {supabase} from '../../services/supbaseClient';
 export const signInWithGoogleThunk = createAsyncThunk(
   'auth/signInWithGoogle',
   async () => {
+    console.log('here');
     const user = await signInWithGoogle();
     return user;
   },

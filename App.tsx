@@ -6,6 +6,8 @@ import {store} from './src/app/store';
 import AuthProvider from './src/features/auth/authProvider';
 import {supabase} from './src/services/supbaseClient';
 import {setUser} from './src/features/auth/authSlice';
+import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
+import COLORS from './src/constants/colors';
 
 function App(): React.JSX.Element {
   useEffect(() => {
@@ -21,13 +23,27 @@ function App(): React.JSX.Element {
   return (
     <Provider store={store}>
       <AuthProvider>
-        <NavigationContainer>
-          {/* Later add stack/tab navigation */}
-          <LoginScreen />
-        </NavigationContainer>
+        <SafeAreaView style={styles.safeArea}>
+          <StatusBar
+            barStyle="light-content"
+            backgroundColor={COLORS.backgroundColor}
+          />
+          <NavigationContainer>
+            {/* Replace this with navigation later */}
+            <LoginScreen />
+          </NavigationContainer>
+        </SafeAreaView>
       </AuthProvider>
     </Provider>
   );
 }
 
 export default App;
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.backgroundColor,
+    // paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+});
