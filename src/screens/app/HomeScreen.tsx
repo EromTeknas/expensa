@@ -2,7 +2,6 @@ import React from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
@@ -16,6 +15,7 @@ import GroupedExpensesList from '../../components/GroupedExpensesList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
 import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
 import COLORS from '../../constants/colors';
+import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
 
 const HomeScreen = () => {
   const {
@@ -45,69 +45,39 @@ const HomeScreen = () => {
             ) : category.categoriesError ? (
               <Text>{category.categoriesError}</Text>
             ) : (
-              <View style={styles.column}>
-                <Text style={styles.label}>Category</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={selectedCategory}
-                    onValueChange={currentCategoryName =>
-                      setSelectedCategory(
-                        category.categories.find(
-                          cat => cat.name === currentCategoryName,
-                        )?.id,
-                      )
-                    }>
-                    {category.categories.map(cat => (
-                      <Picker.Item
-                        key={cat.id}
-                        label={cat.name ?? 'Unnamed'}
-                        value={cat.name}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+              <Dropdown
+                value={selectedCategory!}
+                size={DROPDOWN_SIZE.SMALL}
+                label={'Category'}
+                onSelect={catId =>
+                  setSelectedCategory(
+                    category.categories.find(c => c.id === catId)?.id,
+                  )
+                }>
+                {category.categories.map(c => (
+                  <Picker.Item key={c.id} label={c.name!} value={c.id} />
+                ))}
+              </Dropdown>
             )}
             {account.accountsLoading ? (
               <Text>Loading...</Text>
             ) : account.accountsError ? (
               <Text>{account.accountsError}</Text>
             ) : (
-              <View style={styles.column}>
-                <Text style={styles.label}>Account</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    style={styles.picker}
-                    selectedValue={selectedAccount}
-                    onValueChange={currentAccountName =>
-                      setSelectedAccount(
-                        account.accounts.find(
-                          acc => acc.name === currentAccountName,
-                        )?.id,
-                      )
-                    }>
-                    {account.accounts.map(acc => (
-                      <Picker.Item
-                        key={acc.id}
-                        label={acc.name!}
-                        value={acc.name}
-                      />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+              <Dropdown
+                value={selectedAccount!}
+                size={DROPDOWN_SIZE.SMALL}
+                label={'Account'}
+                onSelect={accId =>
+                  setSelectedAccount(
+                    account.accounts.find(acc => acc.id === accId)?.id,
+                  )
+                }>
+                {account.accounts.map(a => (
+                  <Picker.Item key={a.id} label={a.name!} value={a.id} />
+                ))}
+              </Dropdown>
             )}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Amount</Text>
-            <TextInput
-              value={amount}
-              onChangeText={setAmount}
-              placeholder="Enter amount"
-              keyboardType="numeric"
-              style={styles.input}
-            />
           </View>
 
           <Textfield
@@ -159,6 +129,9 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
