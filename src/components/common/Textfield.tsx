@@ -129,13 +129,13 @@ const getTextfieldContainerStyle = (
   return {
     display: 'flex',
     flexDirection: 'row',
-    gap: 16,
+    gap: 8,
     paddingHorizontal: 16,
     paddingVertical: paddingVertical,
     justifyContent: 'center',
     borderRadius: 12,
     borderColor: borderColor,
-    borderWidth: 2,
+    borderWidth: 1.5,
   };
 };
 
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   outerContainer: {
     position: 'relative',
     display: 'flex',
-    columnGap: 4,
+    gap: 4,
   },
   label: {
     marginLeft: 4,
