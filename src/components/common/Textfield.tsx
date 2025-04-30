@@ -14,6 +14,9 @@ import COLORS from '../../constants/colors';
 import {FONTFAMILIES} from '../../constants/fonts';
 import getFontSize from '../../utils/fontSize';
 
+// TODO
+// Add support for textarea (multiline textinput)
+// When textfield is inactive but user has entered some value into it, the color of text and icons should be white
 export enum TEXTFIELD_SIZE {
   LARGE,
   MEDIUM,
@@ -54,6 +57,7 @@ const Textfield = ({
       <View style={getTextfieldContainerStyle(size, type)}>
         {prefixIcon && (
           <Icon
+            style={getIconStyle(size)}
             color={getIconColor(type)}
             size={getIconSize(size)}
             name={prefixIcon}
@@ -69,9 +73,12 @@ const Textfield = ({
           onFocus={() => setType(TEXTFIELD_TYPE.ACTIVE)}
           onBlur={() => setType(TEXTFIELD_TYPE.INACTIVE)}
           keyboardType={keyboardType}
+          multiline
+          numberOfLines={4}
         />
         {suffixIcon && (
           <Icon
+            style={getIconStyle(size)}
             color={getIconColor(type)}
             size={getIconSize(size)}
             name={suffixIcon}
@@ -83,6 +90,17 @@ const Textfield = ({
 };
 
 export default Textfield;
+const getIconStyle = (size: TEXTFIELD_SIZE): ViewStyle => {
+  const marginTop =
+    size === TEXTFIELD_SIZE.SMALL
+      ? 12
+      : size === TEXTFIELD_SIZE.MEDIUM
+      ? 16
+      : 20;
+  return {
+    marginTop: marginTop,
+  };
+};
 const getIconColor = (type: TEXTFIELD_TYPE) => {
   return type === TEXTFIELD_TYPE.ACTIVE ? COLORS.grey[100] : COLORS.grey[200];
 };
@@ -114,7 +132,7 @@ const getTextfieldContainerStyle = (
     paddingHorizontal: 16,
     paddingVertical: paddingVertical,
     justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
     borderRadius: 12,
     borderColor: borderColor,
     borderWidth: 2,
@@ -142,6 +160,7 @@ const getInputStyles = (
 
 const styles = StyleSheet.create({
   outerContainer: {
+    position: 'relative',
     display: 'flex',
     columnGap: 4,
   },
