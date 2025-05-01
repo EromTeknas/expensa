@@ -1,13 +1,13 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {
-  addExpenseThunk,
+  addTransactionThunk,
   fetchAllAccountsThunk,
   fetchAllCategoriesThunk,
-  fetchAllExpensesThunk,
+  fetchAllTransactionsThunk,
 } from './homeThunk';
 import {Category} from '../../models/categories';
 import {Account} from '../../models/accounts';
-import {EnrichedExpense} from '../../models/expenses';
+import {EnrichedTransaction} from '../../models/transactions';
 
 type homeScreenState = {
   category: {
@@ -20,12 +20,13 @@ type homeScreenState = {
     accountsLoading: boolean;
     accountsError: string;
   };
-  expense: {
-    expenses: EnrichedExpense[];
-    expensesLoading: boolean;
-    expensessError: string;
+  transaction: {
+    transactions: EnrichedTransaction[];
+    transactionsLoading: boolean;
+    transactionsError: string;
   };
 };
+
 const initialHomeScreenState: homeScreenState = {
   category: {
     categories: [],
@@ -37,12 +38,13 @@ const initialHomeScreenState: homeScreenState = {
     accountsLoading: false,
     accountsError: '',
   },
-  expense: {
-    expenses: [],
-    expensesLoading: false,
-    expensessError: '',
+  transaction: {
+    transactions: [],
+    transactionsLoading: false,
+    transactionsError: '',
   },
 };
+
 const homeSlice = createSlice({
   name: 'home',
   initialState: initialHomeScreenState,
@@ -59,8 +61,10 @@ const homeSlice = createSlice({
       })
       .addCase(fetchAllCategoriesThunk.rejected, (state, action) => {
         state.category.categoriesLoading = false;
-        state.category.categoriesError = action.error.name!;
+        state.category.categoriesError =
+          action.error.message ?? 'Failed to fetch categories';
       })
+
       // Accounts Thunk
       .addCase(fetchAllAccountsThunk.pending, state => {
         state.account.accountsLoading = true;
@@ -71,32 +75,36 @@ const homeSlice = createSlice({
       })
       .addCase(fetchAllAccountsThunk.rejected, (state, action) => {
         state.account.accountsLoading = false;
-        state.account.accountsError = action.error.name!;
+        state.account.accountsError =
+          action.error.message ?? 'Failed to fetch accounts';
       })
-      // Expenses Thunk
-      .addCase(fetchAllExpensesThunk.pending, state => {
-        state.expense.expensesLoading = true;
-      })
-      .addCase(fetchAllExpensesThunk.fulfilled, (state, action) => {
-        state.expense.expenses = action.payload;
-        state.expense.expensesLoading = false;
-      })
-      .addCase(fetchAllExpensesThunk.rejected, (state, action) => {
-        state.expense.expensesLoading = false;
-        state.expense.expensessError = action.error.name!;
-      })
-      // Add Expense
-      .addCase(addExpenseThunk.pending, state => {
-        state.expense.expensesLoading = true;
-      })
-      .addCase(addExpenseThunk.fulfilled, (state, action) => {
-        state.expense.expensesLoading = false;
 
-        state.expense.expenses = action.payload;
+      // Transactions Thunk
+      .addCase(fetchAllTransactionsThunk.pending, state => {
+        state.transaction.transactionsLoading = true;
       })
-      .addCase(addExpenseThunk.rejected, (state, action) => {
-        state.expense.expensesLoading = false;
-        state.expense.expensessError = action.error.message!;
+      .addCase(fetchAllTransactionsThunk.fulfilled, (state, action) => {
+        state.transaction.transactions = action.payload;
+        state.transaction.transactionsLoading = false;
+      })
+      .addCase(fetchAllTransactionsThunk.rejected, (state, action) => {
+        state.transaction.transactionsLoading = false;
+        state.transaction.transactionsError =
+          action.error.message ?? 'Failed to fetch transactions';
+      })
+
+      // Add Transaction Thunk
+      .addCase(addTransactionThunk.pending, state => {
+        state.transaction.transactionsLoading = true;
+      })
+      .addCase(addTransactionThunk.fulfilled, (state, action) => {
+        state.transaction.transactions = action.payload;
+        state.transaction.transactionsLoading = false;
+      })
+      .addCase(addTransactionThunk.rejected, (state, action) => {
+        state.transaction.transactionsLoading = false;
+        state.transaction.transactionsError =
+          action.error.message ?? 'Failed to add transaction';
       });
   },
 });

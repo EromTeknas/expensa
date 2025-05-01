@@ -20,7 +20,7 @@ const HomeScreen = () => {
   const {
     category,
     account,
-    expense,
+    transaction,
     selectedCategory,
     setSelectedCategory,
     selectedAccount,
@@ -29,7 +29,7 @@ const HomeScreen = () => {
     setAmount,
     description,
     setDescription,
-    handleAddExpense,
+    handleAddTransaction,
   } = useHomeScreen();
 
   return (
@@ -115,22 +115,22 @@ const HomeScreen = () => {
             <TouchableOpacity
               style={[
                 styles.button,
-                expense.expensesLoading && styles.disabledButton,
+                transaction.transactionsLoading && styles.disabledButton,
               ]}
-              onPress={handleAddExpense}
-              disabled={expense.expensesLoading}>
-              {expense.expensesLoading ? (
+              onPress={handleAddTransaction}
+              disabled={transaction.transactionsLoading}>
+              {transaction.transactionsLoading ? (
                 <ActivityIndicator color="#fff" />
               ) : (
                 <Text style={styles.buttonText}>Add Expense</Text>
               )}
             </TouchableOpacity>
-            {expense.expensessError && (
-              <Text style={styles.errorText}>{expense.expensessError}</Text>
+            {transaction.transactionsError && (
+              <Text style={styles.errorText}>{transaction.transactionsError}</Text>
             )}
           </View>
 
-          <GroupedExpensesList expenses={expense.expenses} />
+          <GroupedExpensesList transactions={transaction.transactions} />
         </View>
       </KeyboardAvoidingView>
     </TouchableWithoutFeedback>

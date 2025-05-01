@@ -1,8 +1,10 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons'; // You can use other icon sets
+import Icon from 'react-native-vector-icons/Ionicons';
 import {format} from 'date-fns';
-import {EnrichedExpense} from '../models/expenses';
+import {EnrichedTransaction} from '../models/transactions';
+import {TRANSACTION_TYPE} from '../models/transactions';
+
 export const categoryIconMap: {
   [key: string]: {iconName: string; color: string};
 } = {
@@ -12,35 +14,44 @@ export const categoryIconMap: {
   accessories: {iconName: 'watch-outline', color: '#F3E5F5'},
   health: {iconName: 'heart-outline', color: '#E1F5FE'},
   medicines: {iconName: 'medkit-outline', color: '#FFF3E0'},
-  custom: {iconName: 'apps-outline', color: '#ECEFF1'}, // fallback
+  custom: {iconName: 'apps-outline', color: '#ECEFF1'},
 };
 
 type Props = {
-  expense: EnrichedExpense;
+  transaction: EnrichedTransaction;
 };
 
-const ExpenseCard: React.FC<Props> = ({expense}) => {
-  const time = format(new Date(expense.created_at), 'hh:mm a');
+const TransactionCard: React.FC<Props> = ({transaction}) => {
+  const time = format(new Date(transaction.created_at), 'hh:mm a');
+
+  const categoryKey = transaction.category.name?.toLowerCase() || 'custom';
   const matchedCategory =
-    categoryIconMap[expense.category.name?.toLowerCase() || 'custom'] ||
-    categoryIconMap.custom;
+    categoryIconMap[categoryKey] || categoryIconMap.custom;
+
+  const isCredit = transaction.type === TRANSACTION_TYPE.CREDIT;
+  const amountColor = isCredit ? '#4CAF50' : '#E53935';
+  const amountPrefix = isCredit ? '+' : '-';
 
   return (
     <View style={styles.container}>
       {/* Icon */}
       <View
         style={[styles.iconCircle, {backgroundColor: matchedCategory.color}]}>
-        <Icon name={matchedCategory.iconName!} size={16} color="#007AFF" />
+        <Icon name={matchedCategory.iconName} size={18} color="#007AFF" />
       </View>
 
       {/* Details */}
       <View style={styles.detailsContainer}>
         <View style={styles.topRow}>
-          <Text style={styles.description}>{expense.description}</Text>
-          <Text style={styles.amount}>₹{expense.amount.toFixed(2)}</Text>
+          <Text style={styles.description}>
+            {transaction.description || transaction.category.name}
+          </Text>
+          <Text style={[styles.amount, {color: amountColor}]}>
+            {amountPrefix}₹{transaction.amount.toFixed(2)}
+          </Text>
         </View>
         <View style={styles.bottomRow}>
-          <Text style={styles.metaText}>{expense.account.name}</Text>
+          <Text style={styles.metaText}>{transaction.account.name}</Text>
           <Text style={styles.metaText}>{time}</Text>
         </View>
       </View>
@@ -66,7 +77,6 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#E0F7FA',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
@@ -87,7 +97,6 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#007AFF',
   },
   bottomRow: {
     flexDirection: 'row',
@@ -100,4 +109,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExpenseCard;
+export default TransactionCard;

@@ -2,11 +2,11 @@ import {createAsyncThunk} from '@reduxjs/toolkit';
 import {Category, fetchAllCategories} from '../../models/categories';
 import {Account, fetchAllAccounts} from '../../models/accounts';
 import {
-  addExpense,
-  EnrichedExpense,
-  fetchAllExpenses,
-  NewExpense,
-} from '../../models/expenses';
+  addTransaction,
+  EnrichedTransaction,
+  fetchAllTransactions,
+  NewTransaction,
+} from '../../models/transactions';
 
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
@@ -35,12 +35,13 @@ export const fetchAllAccountsThunk = createAsyncThunk<
   return data ?? [];
 });
 
-export const fetchAllExpensesThunk = createAsyncThunk<
-  EnrichedExpense[],
+// Fetch all transactions for a user
+export const fetchAllTransactionsThunk = createAsyncThunk<
+  EnrichedTransaction[],
   string | null,
   {rejectValue: string}
->('home/fetchAllExpenses', async (userId, {rejectWithValue}) => {
-  const {data, error} = await fetchAllExpenses(userId!);
+>('home/fetchAllTransactions', async (userId, {rejectWithValue}) => {
+  const {data, error} = await fetchAllTransactions(userId!);
 
   if (error) {
     return rejectWithValue(error.message);
@@ -49,23 +50,28 @@ export const fetchAllExpensesThunk = createAsyncThunk<
   return data ?? [];
 });
 
-export const addExpenseThunk = createAsyncThunk<
-  EnrichedExpense[],
-  NewExpense,
+// Add a transaction and refetch the full list
+export const addTransactionThunk = createAsyncThunk<
+  EnrichedTransaction[],
+  NewTransaction,
   {rejectValue: string}
->('home/addExpense', async (newExpense: NewExpense, {rejectWithValue}) => {
-  const {error: addError} = await addExpense(newExpense);
+>(
+  'home/addTransaction',
+  async (newTransaction: NewTransaction, {rejectWithValue}) => {
+    const {error: addError} = await addTransaction(newTransaction);
 
-  if (addError) {
-    return rejectWithValue(addError.message ?? 'Failed to fetch expenses');
-  }
+    if (addError) {
+      return rejectWithValue(addError.message ?? 'Failed to add transaction');
+    }
 
-  // After insert, fetch the full `account` and `category` data
-  const {data: allExpensesData, error: fetchAllExpensesError} =
-    await fetchAllExpenses(newExpense.user_id);
-  if (fetchAllExpensesError) {
-    return rejectWithValue(fetchAllExpensesError.message);
-  }
+    // Fetch updated transactions after insert
+    const {data: allTransactionsData, error: fetchError} =
+      await fetchAllTransactions(newTransaction.user_id);
 
-  return allExpensesData ?? [];
-});
+    if (fetchError) {
+      return rejectWithValue(fetchError.message);
+    }
+
+    return allTransactionsData ?? [];
+  },
+);

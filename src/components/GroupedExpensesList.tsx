@@ -1,28 +1,28 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import ExpenseCard from './ExpenseCard';
-import { EnrichedExpense } from '../models/expenses';
+import TransactionCard from './TransactionCard';
+import {EnrichedTransaction} from '../models/transactions';
 
 type GroupedExpenses = {
   title: string;
   total: number;
-  data: EnrichedExpense[];
+  data: EnrichedTransaction[];
 };
 
 type Props = {
-  expenses: EnrichedExpense[];
+  transactions: EnrichedTransaction[];
 };
 
-const GroupedExpensesList: React.FC<Props> = ({expenses}) => {
+const GroupedExpensesList: React.FC<Props> = ({transactions}) => {
   // Group expenses by date and calculate total per date
-  const grouped = expenses.reduce<Record<string, GroupedExpenses>>(
-    (acc, expense) => {
-      const date = new Date(expense.created_at).toDateString();
+  const grouped = transactions.reduce<Record<string, GroupedExpenses>>(
+    (acc, transaction) => {
+      const date = new Date(transaction.created_at).toDateString();
       if (!acc[date]) {
         acc[date] = {title: date, total: 0, data: []};
       }
-      acc[date].data.push(expense);
-      acc[date].total += expense.amount;
+      acc[date].data.push(transaction);
+      acc[date].total += transaction.amount;
       return acc;
     },
     {},
@@ -49,7 +49,7 @@ const GroupedExpensesList: React.FC<Props> = ({expenses}) => {
               <Text style={styles.dateTotal}>₹{item.total.toFixed(2)}</Text>
             </View>
             {item.data.map(expense => (
-              <ExpenseCard expense={expense} />
+              <TransactionCard transaction={expense} />
             ))}
           </View>
         )}
