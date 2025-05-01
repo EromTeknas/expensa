@@ -10,7 +10,6 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
 import GroupedExpensesList from '../../components/GroupedExpensesList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
 import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
@@ -40,12 +39,12 @@ const HomeScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.container}>
           <View style={styles.row}>
-            {category.categoriesLoading ? (
-              <Text>Loading...</Text>
-            ) : category.categoriesError ? (
+            {category.categoriesError ? (
               <Text>{category.categoriesError}</Text>
             ) : (
               <Dropdown
+                items={category.categories}
+                schema={{label: 'name', value: 'id'}}
                 value={selectedCategory!}
                 size={DROPDOWN_SIZE.SMALL}
                 label={'Category'}
@@ -53,13 +52,26 @@ const HomeScreen = () => {
                   setSelectedCategory(
                     category.categories.find(c => c.id === catId)?.id,
                   )
-                }>
-                {category.categories.map(c => (
-                  <Picker.Item key={c.id} label={c.name!} value={c.id} />
-                ))}
-              </Dropdown>
+                }
+              />
             )}
-            {account.accountsLoading ? (
+            {account.accountsError ? (
+              <Text>{account.accountsError}</Text>
+            ) : (
+              <Dropdown
+                items={account.accounts}
+                schema={{label: 'name', value: 'id'}}
+                value={selectedAccount!}
+                size={DROPDOWN_SIZE.SMALL}
+                label={'Account'}
+                onSelect={accId =>
+                  setSelectedAccount(
+                    account.accounts.find(a => a.id === accId)?.id,
+                  )
+                }
+              />
+            )}
+            {/* {account.accountsLoading ? (
               <Text>Loading...</Text>
             ) : account.accountsError ? (
               <Text>{account.accountsError}</Text>
@@ -77,7 +89,7 @@ const HomeScreen = () => {
                   <Picker.Item key={a.id} label={a.name!} value={a.id} />
                 ))}
               </Dropdown>
-            )}
+            )} */}
           </View>
 
           <Textfield
