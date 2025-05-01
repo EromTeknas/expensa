@@ -13,7 +13,7 @@ type Props = {
   transactions: EnrichedTransaction[];
 };
 
-const GroupedExpensesList: React.FC<Props> = ({transactions}) => {
+const GroupedTransactionsList: React.FC<Props> = ({transactions}) => {
   // Group expenses by date and calculate total per date
   const grouped = transactions.reduce<Record<string, GroupedExpenses>>(
     (acc, transaction) => {
@@ -101,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GroupedExpensesList;
+export default GroupedTransactionsList;
