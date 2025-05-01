@@ -6,7 +6,7 @@ import {
   fetchAllTransactionsThunk,
   addTransactionThunk,
 } from '../features/home/homeThunk';
-import {TRANSACTION_TYPE} from '../models/transactions';
+import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -41,7 +41,7 @@ export const useHomeScreen = () => {
     }
   }, [account.accounts]);
 
-  const handleAddTransaction = () => {
+  const handleAddTransaction = (transactionType: TransactionType) => {
     if (!selectedCategory || !selectedAccount || !user?.id) return;
 
     return dispatch(
@@ -51,13 +51,18 @@ export const useHomeScreen = () => {
         category_id: selectedCategory,
         account_id: selectedAccount,
         description,
-        type: TRANSACTION_TYPE.CREDIT, // CREDIT or DEBIT
+        type: transactionType, // CREDIT or DEBIT
       }),
     ).finally(() => {
-      setAmount('0');
+      setAmount('');
       setDescription('');
     });
   };
+
+  const handleCreditTransaction = () =>
+    handleAddTransaction(TRANSACTION_TYPE.CREDIT);
+  const handleDebitTransaction = () =>
+    handleAddTransaction(TRANSACTION_TYPE.DEBIT);
 
   return {
     category,
@@ -71,6 +76,7 @@ export const useHomeScreen = () => {
     setAmount,
     description,
     setDescription,
-    handleAddTransaction,
+    handleCreditTransaction,
+    handleDebitTransaction,
   };
 };

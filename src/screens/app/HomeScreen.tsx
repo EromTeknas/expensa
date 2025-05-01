@@ -3,8 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
@@ -15,6 +13,7 @@ import {useHomeScreen} from '../../hooks/useHomeScreen';
 import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
 import COLORS from '../../constants/colors';
 import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
+import Button, {BUTTON_SIZE} from '../../components/common/Button';
 
 const HomeScreen = () => {
   const {
@@ -29,7 +28,8 @@ const HomeScreen = () => {
     setAmount,
     description,
     setDescription,
-    handleAddTransaction,
+    handleCreditTransaction,
+    handleDebitTransaction,
   } = useHomeScreen();
 
   return (
@@ -71,25 +71,6 @@ const HomeScreen = () => {
                 }
               />
             )}
-            {/* {account.accountsLoading ? (
-              <Text>Loading...</Text>
-            ) : account.accountsError ? (
-              <Text>{account.accountsError}</Text>
-            ) : (
-              <Dropdown
-                value={selectedAccount!}
-                size={DROPDOWN_SIZE.SMALL}
-                label={'Account'}
-                onSelect={accId =>
-                  setSelectedAccount(
-                    account.accounts.find(acc => acc.id === accId)?.id,
-                  )
-                }>
-                {account.accounts.map(a => (
-                  <Picker.Item key={a.id} label={a.name!} value={a.id} />
-                ))}
-              </Dropdown>
-            )} */}
           </View>
 
           <Textfield
@@ -111,22 +92,31 @@ const HomeScreen = () => {
             multiline={true}
             numberOfLines={5}
           />
-          <View>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                transaction.transactionsLoading && styles.disabledButton,
-              ]}
-              onPress={handleAddTransaction}
-              disabled={transaction.transactionsLoading}>
-              {transaction.transactionsLoading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Add Expense</Text>
-              )}
-            </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <Button
+              label="Debit"
+              onPress={handleDebitTransaction}
+              size={BUTTON_SIZE.MEDIUM}
+              prefixIcon={'arrow-down-left'}
+              loading={transaction.transactionsLoading}
+              style={{
+                backgroundColor: COLORS.debitRed,
+              }}
+            />
+            <Button
+              label="Credit"
+              onPress={handleCreditTransaction}
+              size={BUTTON_SIZE.MEDIUM}
+              prefixIcon={'arrow-down-left'}
+              loading={transaction.transactionsLoading}
+              style={{
+                backgroundColor: COLORS.creditGreen,
+              }}
+            />
             {transaction.transactionsError && (
-              <Text style={styles.errorText}>{transaction.transactionsError}</Text>
+              <Text style={styles.errorText}>
+                {transaction.transactionsError}
+              </Text>
             )}
           </View>
 
@@ -202,5 +192,11 @@ const styles = StyleSheet.create({
     color: 'red',
     marginTop: 5,
     fontSize: 12,
+  },
+
+  buttonRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 8,
   },
 });
