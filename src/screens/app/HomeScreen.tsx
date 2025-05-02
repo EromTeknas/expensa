@@ -14,6 +14,8 @@ import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
 import COLORS from '../../constants/colors';
 import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
 import Button, {BUTTON_SIZE} from '../../components/common/Button';
+import TotalTransactionsStatus from '../../components/TotalTransactionsStatus';
+import {FONTFAMILIES} from '../../constants/fonts';
 
 const HomeScreen = () => {
   const {
@@ -38,6 +40,18 @@ const HomeScreen = () => {
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.container}>
+          <TotalTransactionsStatus
+            totalCreditAmount="10000"
+            totalDebitAmount="21000"
+          />
+          <Text
+            style={{
+              fontFamily: FONTFAMILIES.LATO.bold,
+              fontSize: 24,
+              color: COLORS.grey[100],
+            }}>
+            Add Transaction
+          </Text>
           <View style={styles.row}>
             {category.categoriesError ? (
               <Text>{category.categoriesError}</Text>
