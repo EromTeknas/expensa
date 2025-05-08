@@ -45,6 +45,7 @@ const Dropdown = ({
   return (
     <View style={styles.outerContainer}>
       {label && <Text style={styles.label}>{label}</Text>}
+
       <DropDownPicker
         // multiple={true}
         theme="DARK"
@@ -79,7 +80,7 @@ const getPickerTextStyle = (
   type: DROPDOWN_TYPE,
 ): TextStyle => ({
   color: type === DROPDOWN_TYPE.ACTIVE ? COLORS.grey[100] : COLORS.grey[200],
-  fontFamily: FONTFAMILIES.LATO.regular,
+  fontFamily: FONTFAMILIES.LATO.medium,
   fontSize: size === DROPDOWN_SIZE.MEDIUM ? getFontSize(16) : getFontSize(14),
 });
 
@@ -87,16 +88,17 @@ const getPickerContainerStyle = (
   size: DROPDOWN_SIZE,
   type: DROPDOWN_TYPE,
 ): ViewStyle => {
-  // const PICKER_HEIGHT = size === DROPDOWN_SIZE.MEDIUM ? 56 : 40;
+  const PICKER_HEIGHT = size === DROPDOWN_SIZE.MEDIUM ? 56 : 40;
   return {
+    display: 'flex',
     backgroundColor: 'transparent',
     borderWidth: 1,
-    // paddingVertical: 0,
-    paddingHorizontal: 8,
+    paddingHorizontal: 16,
     borderColor:
       type === DROPDOWN_TYPE.ACTIVE ? COLORS.accent : COLORS.grey[200],
     borderRadius: 12,
-    // height: PICKER_HEIGHT,
+    minHeight: PICKER_HEIGHT,
+    alignContent: 'stretch',
     justifyContent: 'center',
   };
 };
