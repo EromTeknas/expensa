@@ -38,24 +38,25 @@ const GroupedTransactionsList = ({transactions}: Props) => {
     }))
     .sort((a, b) => new Date(b.title).getTime() - new Date(a.title).getTime());
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={groupedArray}
-        keyExtractor={(item: GroupedExpenses) => item.title}
-        renderItem={({item}) => (
-          <View>
-            <View style={styles.dateRow}>
-              <Text style={styles.dateSeparator}>{item.title}</Text>
-              <Text style={styles.dateTotal}>₹{item.total.toFixed(2)}</Text>
-            </View>
-            {item.data.map(expense => (
-              <TransactionCard transaction={expense} />
-            ))}
+    // <View style={styles.container}>
+    <FlatList
+      bounces={true}
+      data={groupedArray}
+      keyExtractor={(item: GroupedExpenses) => item.title}
+      renderItem={({item}) => (
+        <View>
+          <View style={styles.dateRow}>
+            <Text style={styles.dateSeparator}>{item.title}</Text>
+            <Text style={styles.dateTotal}>₹{item.total.toFixed(2)}</Text>
           </View>
-        )}
-        contentContainerStyle={styles.content}
-      />
-    </View>
+          {item.data.map(expense => (
+            <TransactionCard transaction={expense} />
+          ))}
+        </View>
+      )}
+      contentContainerStyle={styles.content}
+    />
+    // </View>
   );
 };
 

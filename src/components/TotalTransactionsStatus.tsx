@@ -32,7 +32,7 @@ const TotalTransactionsStatus = ({
       end={{x: 1, y: 0.5}}
       style={styles.container}>
       {transactions.map((transaction, index) => (
-        <React.Fragment key={index}>
+        <React.Fragment>
           <OptionColumn label={transaction.label} amount={transaction.amount} />
           {index < transactions.length - 1 && <View style={styles.divider} />}
         </React.Fragment>
