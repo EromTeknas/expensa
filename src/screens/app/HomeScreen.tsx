@@ -16,6 +16,7 @@ import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
 import Button, {BUTTON_SIZE} from '../../components/common/Button';
 import TotalTransactionsStatus from '../../components/TotalTransactionsStatus';
 import {FONTFAMILIES} from '../../constants/fonts';
+import {CurrencyRupeeIcon, CardTextIcon} from '../../components/common/Icons';
 
 const HomeScreen = () => {
   const {
@@ -47,7 +48,7 @@ const HomeScreen = () => {
           <Text
             style={{
               fontFamily: FONTFAMILIES.LATO.bold,
-              fontSize: 24,
+              fontSize: 20,
               color: COLORS.grey[100],
             }}>
             Add Transaction
@@ -92,7 +93,7 @@ const HomeScreen = () => {
             size={TEXTFIELD_SIZE.MEDIUM}
             placeholder={'Enter Amount'}
             label={'Amount'}
-            prefixIcon={'invert-mode-outline'}
+            prefixIcon={CurrencyRupeeIcon}
             onChangeText={amt => setAmount(amt)}
             keyboardType={'number-pad'}
           />
@@ -101,7 +102,7 @@ const HomeScreen = () => {
             size={TEXTFIELD_SIZE.SMALL}
             placeholder={'Enter Description'}
             label={'Description'}
-            prefixIcon={'invert-mode-outline'}
+            prefixIcon={CardTextIcon}
             onChangeText={des => setDescription(des)}
             multiline={true}
             numberOfLines={5}

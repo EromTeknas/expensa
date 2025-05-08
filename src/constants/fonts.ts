@@ -12,3 +12,4 @@ export const FONTFAMILIES = {
     blackItalic: 'Lato-BlackItalic',
   },
 };
+

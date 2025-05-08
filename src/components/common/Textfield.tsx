@@ -8,10 +8,10 @@ import {
   TextStyle,
   KeyboardTypeOptions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import COLORS from '../../constants/colors';
 import {FONTFAMILIES} from '../../constants/fonts';
 import getFontSize from '../../utils/fontSize';
+import {SvgProps} from 'react-native-svg';
 
 // TODO
 // When textfield is inactive but user has entered some value into it, the color of text and icons should be white
@@ -32,8 +32,8 @@ type TextfieldProps = {
   size: TEXTFIELD_SIZE;
   placeholder: string;
   label?: string | null;
-  prefixIcon?: string | null;
-  suffixIcon?: string | null;
+  prefixIcon?: React.FC<SvgProps> | null;
+  suffixIcon?: React.FC<SvgProps> | null;
   onChangeText: (text: string) => void;
   keyboardType?: KeyboardTypeOptions;
   multiline?: boolean;
@@ -45,8 +45,8 @@ const Textfield = ({
   label,
   placeholder,
   value,
-  prefixIcon,
-  suffixIcon,
+  prefixIcon: PrefixIcon,
+  suffixIcon: SuffixIcon,
   onChangeText,
   keyboardType,
   multiline,
@@ -58,12 +58,12 @@ const Textfield = ({
     <View style={styles.outerContainer}>
       {label && <Text style={styles.label}>{label}</Text>}
       <View style={getTextfieldContainerStyle(size, type)}>
-        {prefixIcon && (
-          <Icon
+        {PrefixIcon && (
+          <PrefixIcon
             style={getIconStyle(size)}
             color={getIconColor(type)}
-            size={getIconSize(size)}
-            name={prefixIcon}
+            height={getIconSize(size)}
+            width={getIconSize(size)}
           />
         )}
         <TextInput
@@ -81,12 +81,12 @@ const Textfield = ({
           verticalAlign="top"
           textAlignVertical="top"
         />
-        {suffixIcon && (
-          <Icon
+        {SuffixIcon && (
+          <SuffixIcon
             style={getIconStyle(size)}
             color={getIconColor(type)}
-            size={getIconSize(size)}
-            name={suffixIcon}
+            height={getIconSize(size)}
+            width={getIconSize(size)}
           />
         )}
       </View>
