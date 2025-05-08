@@ -16,7 +16,12 @@ import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
 import Button, {BUTTON_SIZE} from '../../components/common/Button';
 import TotalTransactionsStatus from '../../components/TotalTransactionsStatus';
 import {FONTFAMILIES} from '../../constants/fonts';
-import {CurrencyRupeeIcon, CardTextIcon} from '../../components/common/Icons';
+import {
+  CurrencyRupeeIcon,
+  CardTextIcon,
+  ArrowUpRightIcon,
+  ArrowDownLeftIcon,
+} from '../../components/common/Icons';
 
 const HomeScreen = () => {
   const {
@@ -114,7 +119,7 @@ const HomeScreen = () => {
               label="Debit"
               onPress={handleDebitTransaction}
               size={BUTTON_SIZE.MEDIUM}
-              prefixIcon={'arrow-down-left'}
+              prefixIcon={ArrowUpRightIcon}
               loading={transaction.transactionsLoading}
               style={{
                 backgroundColor: COLORS.debitRed,
@@ -124,7 +129,7 @@ const HomeScreen = () => {
               label="Credit"
               onPress={handleCreditTransaction}
               size={BUTTON_SIZE.MEDIUM}
-              prefixIcon={'arrow-down-left'}
+              prefixIcon={ArrowDownLeftIcon}
               loading={transaction.transactionsLoading}
               style={{
                 backgroundColor: COLORS.creditGreen,

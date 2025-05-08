@@ -15,7 +15,7 @@ import {
 import {FONTFAMILIES} from '../../constants/fonts';
 import COLORS from '../../constants/colors';
 import getFontSize from '../../utils/fontSize';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {SvgProps} from 'react-native-svg/lib/typescript';
 
 export enum BUTTON_SIZE {
   SMALL = 12,
@@ -29,8 +29,8 @@ type ButtonProps = {
   size?: BUTTON_SIZE;
   disabled?: boolean;
   loading?: boolean;
-  prefixIcon?: string;
-  suffixIcon?: string;
+  prefixIcon?: React.FC<SvgProps> | null;
+  suffixIcon?: React.FC<SvgProps> | null;
   style?: ViewStyle;
 };
 
@@ -40,8 +40,8 @@ const Button = ({
   size = BUTTON_SIZE.MEDIUM,
   disabled = false,
   loading = true,
-  prefixIcon = 'chevron-up-outline',
-  suffixIcon,
+  prefixIcon: PrefixIcon,
+  suffixIcon: SuffixIcon,
   style,
 }: ButtonProps) => {
   const animation = useRef(new Animated.Value(1)).current;
@@ -106,12 +106,20 @@ const Button = ({
           <ActivityIndicator color={COLORS.grey[100]} />
         ) : (
           <View style={styles.content}>
-            {prefixIcon && (
-              <Icon name={prefixIcon} style={styles.icon} size={iconSize} />
+            {PrefixIcon && (
+              <PrefixIcon
+                style={styles.icon}
+                height={iconSize}
+                width={iconSize}
+              />
             )}
             <Text style={[styles.text, textStyle]}>{label}</Text>
-            {suffixIcon && (
-              <Icon name={suffixIcon} style={styles.icon} size={iconSize} />
+            {SuffixIcon && (
+              <SuffixIcon
+                style={styles.icon}
+                height={iconSize}
+                width={iconSize}
+              />
             )}
           </View>
         )}
