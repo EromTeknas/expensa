@@ -50,7 +50,12 @@ const GroupedTransactionsList = ({transactions}: Props) => {
             <Text style={styles.dateTotal}>₹{item.total.toFixed(2)}</Text>
           </View>
           {item.data.map(expense => (
-            <TransactionCard transaction={expense} />
+            <TransactionCard
+              transaction={expense}
+              onDelete={id => console.log('onDelete')}
+              onEdit={id => console.log('onEdit')}
+              onSelect={id => console.log('onSelect')}
+            />
           ))}
         </View>
       )}

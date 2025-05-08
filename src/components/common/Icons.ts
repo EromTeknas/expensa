@@ -1,3 +1,4 @@
+export { default as ArchiveIcon } from '../../assets/icons/archive.svg';
 export { default as ArrowDownLeftIcon } from '../../assets/icons/arrow-down-left.svg';
 export { default as ArrowUpRightIcon } from '../../assets/icons/arrow-up-right.svg';
 export { default as CardTextIcon } from '../../assets/icons/card-text.svg';
@@ -5,6 +6,7 @@ export { default as ClockFillIcon } from '../../assets/icons/clock-fill.svg';
 export { default as ClockHistoryIcon } from '../../assets/icons/clock-history.svg';
 export { default as CurrencyRupeeIcon } from '../../assets/icons/currency-rupee.svg';
 export { default as GearIcon } from '../../assets/icons/gear.svg';
+export { default as PencilIcon } from '../../assets/icons/pencil.svg';
 export { default as PlusSquareFillIcon } from '../../assets/icons/plus-square-fill.svg';
 export { default as PlusSquareIcon } from '../../assets/icons/plus-square.svg';
 export { default as ReceiptCutoffIcon } from '../../assets/icons/receipt-cutoff.svg';

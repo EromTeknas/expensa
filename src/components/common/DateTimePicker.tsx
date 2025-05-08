@@ -29,7 +29,7 @@ const DateTimePickerComponent = ({
   };
 
   const handleLongPress = () => {
-    HapticFeedback.trigger('impactLight'); // Trigger vibration
+    HapticFeedback.trigger('impactHeavy'); // Trigger vibration
     setToNow();
   };
 
