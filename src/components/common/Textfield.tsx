@@ -98,10 +98,10 @@ export default Textfield;
 const getIconStyle = (size: TEXTFIELD_SIZE): ViewStyle => {
   const marginTop =
     size === TEXTFIELD_SIZE.SMALL
-      ? 14
+      ? 12
       : size === TEXTFIELD_SIZE.MEDIUM
-      ? 14
-      : 18;
+      ? 10
+      : 10;
   return {
     marginTop: marginTop,
   };
@@ -121,7 +121,7 @@ const getTextfieldContainerStyle = (
   type: TEXTFIELD_TYPE,
 ): ViewStyle => {
   const paddingVertical =
-    size === TEXTFIELD_SIZE.LARGE ? 12 : size === TEXTFIELD_SIZE.MEDIUM ? 8 : 4;
+    size === TEXTFIELD_SIZE.LARGE ? 6 : size === TEXTFIELD_SIZE.MEDIUM ? 4 : 2;
 
   const borderColor =
     type === TEXTFIELD_TYPE.ACTIVE ? COLORS.accent : COLORS.grey[200];
@@ -135,7 +135,7 @@ const getTextfieldContainerStyle = (
     justifyContent: 'center',
     borderRadius: 12,
     borderColor: borderColor,
-    borderWidth: 1.5,
+    borderWidth: 1,
   };
 };
 
@@ -155,7 +155,7 @@ const getInputStyles = (
   const fontColor =
     type === TEXTFIELD_TYPE.ACTIVE ? COLORS.grey[100] : COLORS.grey[200];
   return {
-    fontFamily: FONTFAMILIES.LATO.regular,
+    fontFamily: FONTFAMILIES.LATO.medium,
     fontSize: fontSize,
     color: fontColor,
     flex: 1,
