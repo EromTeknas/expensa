@@ -13,7 +13,7 @@ type Props = {
   transactions: EnrichedTransaction[];
 };
 
-const GroupedTransactionsList: React.FC<Props> = ({transactions}) => {
+const GroupedTransactionsList = ({transactions}: Props) => {
   // Group expenses by date and calculate total per date
   const grouped = transactions.reduce<Record<string, GroupedExpenses>>(
     (acc, transaction) => {
@@ -41,7 +41,7 @@ const GroupedTransactionsList: React.FC<Props> = ({transactions}) => {
     <View style={styles.container}>
       <FlatList
         data={groupedArray}
-        keyExtractor={item => item.title}
+        keyExtractor={(item: GroupedExpenses) => item.title}
         renderItem={({item}) => (
           <View>
             <View style={styles.dateRow}>
@@ -70,7 +70,6 @@ const styles = StyleSheet.create({
   dateRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
     marginBottom: 10,
   },
   dateSeparator: {

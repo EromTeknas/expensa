@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Animated,
 } from 'react-native';
 import GroupedExpensesList from '../../components/GroupedTransactionsList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
@@ -15,13 +16,14 @@ import COLORS from '../../constants/colors';
 import Dropdown, {DROPDOWN_SIZE} from '../../components/common/Dropdown';
 import Button, {BUTTON_SIZE} from '../../components/common/Button';
 import TotalTransactionsStatus from '../../components/TotalTransactionsStatus';
-import {FONTFAMILIES} from '../../constants/fonts';
 import {
   CurrencyRupeeIcon,
   CardTextIcon,
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
 } from '../../components/common/Icons';
+import DateTimePickerComponent from '../../components/common/DateTimePicker';
+import {FONTFAMILIES} from '../../constants/fonts';
 
 const HomeScreen = () => {
   const {
@@ -39,107 +41,114 @@ const HomeScreen = () => {
     handleCreditTransaction,
     handleDebitTransaction,
   } = useHomeScreen();
+  const [scrollY] = useState(new Animated.Value(0));
 
+  const collapseHeight = scrollY.interpolate({
+    inputRange: [0, 150],
+    outputRange: [200, 0],
+    extrapolate: 'clamp',
+  });
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.container}>
+        <View style={styles.outerContainer}>
           <TotalTransactionsStatus
             transactions={[
               {label: 'This Month', amount: 10000},
               {label: 'This Week', amount: 5000},
             ]}
           />
-          <Text
-            style={{
-              fontFamily: FONTFAMILIES.LATO.bold,
-              fontSize: 20,
-              color: COLORS.grey[100],
-            }}>
-            Add Transaction
-          </Text>
-          <View style={styles.row}>
-            {category.categoriesError ? (
-              <Text>{category.categoriesError}</Text>
-            ) : (
-              <Dropdown
-                items={category.categories}
-                schema={{label: 'name', value: 'id'}}
-                value={selectedCategory!}
-                size={DROPDOWN_SIZE.SMALL}
-                label={'Category'}
-                onSelect={catId =>
-                  setSelectedCategory(
-                    category.categories.find(c => c.id === catId)?.id,
-                  )
-                }
+          <View style={styles.addTransactionSection}>
+            <View style={styles.addTransactionSectionHeader}>
+              <Text style={styles.sectionHeader}>Add Transaction</Text>
+              <DateTimePickerComponent
+                onDateChange={date => console.log('Selected Date:', date)}
               />
-            )}
-            {account.accountsError ? (
-              <Text>{account.accountsError}</Text>
-            ) : (
-              <Dropdown
-                items={account.accounts}
-                schema={{label: 'name', value: 'id'}}
-                value={selectedAccount!}
-                size={DROPDOWN_SIZE.SMALL}
-                label={'Account'}
-                onSelect={accId =>
-                  setSelectedAccount(
-                    account.accounts.find(a => a.id === accId)?.id,
-                  )
-                }
+            </View>
+            <View style={styles.addTransactionInnerSection}>
+              <View style={styles.row}>
+                {category.categoriesError ? (
+                  <Text>{category.categoriesError}</Text>
+                ) : (
+                  <Dropdown
+                    items={category.categories}
+                    schema={{label: 'name', value: 'id'}}
+                    value={selectedCategory!}
+                    size={DROPDOWN_SIZE.SMALL}
+                    label={'Category'}
+                    onSelect={catId =>
+                      setSelectedCategory(
+                        category.categories.find(c => c.id === catId)?.id,
+                      )
+                    }
+                  />
+                )}
+                {account.accountsError ? (
+                  <Text>{account.accountsError}</Text>
+                ) : (
+                  <Dropdown
+                    items={account.accounts}
+                    schema={{label: 'name', value: 'id'}}
+                    value={selectedAccount!}
+                    size={DROPDOWN_SIZE.SMALL}
+                    label={'Account'}
+                    onSelect={accId =>
+                      setSelectedAccount(
+                        account.accounts.find(a => a.id === accId)?.id,
+                      )
+                    }
+                  />
+                )}
+              </View>
+              <Textfield
+                value={amount}
+                size={TEXTFIELD_SIZE.MEDIUM}
+                placeholder={'Enter Amount'}
+                label={'Amount'}
+                prefixIcon={CurrencyRupeeIcon}
+                onChangeText={amt => setAmount(amt)}
+                keyboardType={'number-pad'}
               />
-            )}
-          </View>
-
-          <Textfield
-            value={amount}
-            size={TEXTFIELD_SIZE.MEDIUM}
-            placeholder={'Enter Amount'}
-            label={'Amount'}
-            prefixIcon={CurrencyRupeeIcon}
-            onChangeText={amt => setAmount(amt)}
-            keyboardType={'number-pad'}
-          />
-          <Textfield
-            value={description}
-            size={TEXTFIELD_SIZE.SMALL}
-            placeholder={'Enter Description'}
-            label={'Description'}
-            prefixIcon={CardTextIcon}
-            onChangeText={des => setDescription(des)}
-            multiline={true}
-            numberOfLines={5}
-          />
-          <View style={styles.buttonRow}>
-            <Button
-              label="Debit"
-              onPress={handleDebitTransaction}
-              size={BUTTON_SIZE.MEDIUM}
-              prefixIcon={ArrowUpRightIcon}
-              loading={transaction.transactionsLoading}
-              style={{
-                backgroundColor: COLORS.debitRed,
-              }}
-            />
-            <Button
-              label="Credit"
-              onPress={handleCreditTransaction}
-              size={BUTTON_SIZE.MEDIUM}
-              prefixIcon={ArrowDownLeftIcon}
-              loading={transaction.transactionsLoading}
-              style={{
-                backgroundColor: COLORS.creditGreen,
-              }}
-            />
-            {transaction.transactionsError && (
-              <Text style={styles.errorText}>
-                {transaction.transactionsError}
-              </Text>
-            )}
+              <Textfield
+                value={description}
+                size={TEXTFIELD_SIZE.SMALL}
+                placeholder={'Enter Description'}
+                label={'Description'}
+                prefixIcon={CardTextIcon}
+                onChangeText={des => setDescription(des)}
+                multiline={true}
+                numberOfLines={5}
+              />
+              <View style={styles.buttonRow}>
+                <Button
+                  label="Debit"
+                  onPress={handleDebitTransaction}
+                  size={BUTTON_SIZE.MEDIUM}
+                  prefixIcon={ArrowUpRightIcon}
+                  loading={transaction.transactionsLoading}
+                  style={{
+                    backgroundColor: COLORS.debitRed,
+                  }}
+                />
+                <Button
+                  label="Credit"
+                  onPress={handleCreditTransaction}
+                  size={BUTTON_SIZE.MEDIUM}
+                  prefixIcon={ArrowDownLeftIcon}
+                  loading={transaction.transactionsLoading}
+                  style={{
+                    backgroundColor: COLORS.creditGreen,
+                  }}
+                />
+                {transaction.transactionsError && (
+                  <Text style={styles.errorText}>
+                    {transaction.transactionsError}
+                  </Text>
+                )}
+              </View>
+            </View>
           </View>
 
           <GroupedExpensesList transactions={transaction.transactions} />
@@ -152,14 +161,35 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 16,
+    gap: 32,
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 16,
     backgroundColor: COLORS.backgroundColor,
+  },
+  addTransactionSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
+  },
+  addTransactionSectionHeader: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  sectionHeader: {
+    fontFamily: FONTFAMILIES.LATO.bold,
+    fontSize: 20,
+    color: COLORS.grey[100],
+  },
+  addTransactionInnerSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
   },
   row: {
     flexDirection: 'row',

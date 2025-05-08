@@ -12,5 +12,5 @@
       "*": ["node_modules/*", "src/*"]
     }
   },
-  "include": ["src", "declarations.d.ts"]
+  "include": ["src", "src/@types"]
 }
