@@ -10,14 +10,20 @@ import Svg, {
 import LinearGradientComponent from 'react-native-linear-gradient';
 import {FONTFAMILIES} from '../constants/fonts';
 import COLORS from '../constants/colors';
+import {formatRupee} from '../utils/formatRupee';
+import {CurrencyRupeeIcon} from './common/Icons';
+
+type Transaction = {
+  label: string;
+  amount: number | string;
+};
+
 type TotalTransactionsStatusProps = {
-  totalDebitAmount: string;
-  totalCreditAmount: string;
+  transactions: Transaction[];
 };
 
 const TotalTransactionsStatus = ({
-  totalDebitAmount,
-  totalCreditAmount,
+  transactions,
 }: TotalTransactionsStatusProps) => {
   return (
     <LinearGradientComponent
@@ -25,9 +31,12 @@ const TotalTransactionsStatus = ({
       start={{x: 0, y: 0.5}}
       end={{x: 1, y: 0.5}}
       style={styles.container}>
-      <OptionColumn label="This Month" amount={totalDebitAmount} />
-      <View style={styles.divider} />
-      <OptionColumn label="Today" amount={totalCreditAmount} />
+      {transactions.map((transaction, index) => (
+        <React.Fragment key={index}>
+          <OptionColumn label={transaction.label} amount={transaction.amount} />
+          {index < transactions.length - 1 && <View style={styles.divider} />}
+        </React.Fragment>
+      ))}
       <BackgroundEllipse />
       <GradientCircle />
     </LinearGradientComponent>
@@ -36,14 +45,17 @@ const TotalTransactionsStatus = ({
 
 type OptionColumnProps = {
   label: string;
-  amount: string;
+  amount: number | string;
 };
 
 const OptionColumn = ({label, amount}: OptionColumnProps) => {
   return (
     <View style={styles.optionColumn}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={styles.amount}>{amount}</Text>
+      <View style={styles.optionColumnRow}>
+        <CurrencyRupeeIcon width={24} height={28} color={COLORS.grey[100]} />
+        <Text style={styles.amount}>{formatRupee(amount)}</Text>
+      </View>
     </View>
   );
 };
@@ -87,6 +99,7 @@ const GradientCircle = () => {
     </Svg>
   );
 };
+
 export default TotalTransactionsStatus;
 
 const styles = StyleSheet.create({
@@ -119,6 +132,12 @@ const styles = StyleSheet.create({
     zIndex: 3,
     flex: 1,
   },
+  optionColumnRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   label: {
     fontFamily: FONTFAMILIES.LATO.light,
     fontSize: 12,
@@ -134,23 +153,23 @@ const styles = StyleSheet.create({
   },
   svgLarge: {
     position: 'absolute',
-    width: 139, // 8.6875rem * 16 = 139px
-    height: 106, // 6.625rem * 16 = 106px
-    left: -12, // -0.75rem * 16 = -12px
-    bottom: -26, // -1.625rem * 16 = -26px
-    zIndex: 1, // place it behind content
+    width: 139,
+    height: 106,
+    left: -12,
+    bottom: -26,
+    zIndex: 1,
   },
   svgSmall: {
     position: 'absolute',
-    width: 92, // 5.75rem * 16
+    width: 92,
     height: 92,
-    left: 87, // 5.4375rem * 16
-    bottom: -53, // -3.3125rem * 16
+    left: 87,
+    bottom: -53,
     zIndex: 2,
   },
   divider: {
     width: 1,
-    backgroundColor: COLORS.grey[100], // or any color you prefer
+    backgroundColor: COLORS.grey[100],
     marginVertical: 6,
   },
 });

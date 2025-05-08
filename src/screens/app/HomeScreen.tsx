@@ -42,8 +42,10 @@ const HomeScreen = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <View style={styles.container}>
           <TotalTransactionsStatus
-            totalCreditAmount="10000"
-            totalDebitAmount="21000"
+            transactions={[
+              {label: 'This Month', amount: 10000},
+              {label: 'This Week', amount: 5000},
+            ]}
           />
           <Text
             style={{
