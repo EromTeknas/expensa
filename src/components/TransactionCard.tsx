@@ -6,13 +6,13 @@ import {
   PanResponder,
   StyleSheet,
   Vibration,
-  TouchableOpacity,
   Pressable,
 } from 'react-native';
-import {ArchiveIcon, PencilIcon} from './common/Icons';
+import {ArchiveIcon, CurrencyRupeeIcon, PencilIcon} from './common/Icons';
 import COLORS from '../constants/colors';
 import {FONTFAMILIES} from '../constants/fonts';
-import {EnrichedTransaction} from 'src/models/transactions';
+import {EnrichedTransaction, TRANSACTION_TYPE} from '../models/transactions';
+import {formatRupee} from '../utils/formatRupee';
 
 interface TransactionCardProps {
   transaction: EnrichedTransaction;
@@ -108,8 +108,34 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         <Animated.View
           {...panResponder.panHandlers}
           style={[styles.card, {transform: [{translateX}, {scale}]}]}>
-          <Text style={styles.title}>{transaction.description}</Text>
-          <Text style={styles.amount}>₹{transaction.amount}</Text>
+          <ArchiveIcon height={28} width={28} color={COLORS.grey[100]} />
+          <View style={styles.cardContent}>
+            <Text style={styles.cardDescription}>Shopping for Jeans</Text>
+            <Text style={styles.cardMetaDetails}>Cash | 10:30 PM</Text>
+          </View>
+          <View style={styles.cardAmountContainer}>
+            <Text
+              style={[
+                styles.cardAmount,
+                {
+                  color:
+                    transaction.type === TRANSACTION_TYPE.CREDIT
+                      ? COLORS.creditGreen
+                      : COLORS.debitRed,
+                },
+              ]}>
+              {formatRupee(100, 2)}
+            </Text>
+            <CurrencyRupeeIcon
+              width={20}
+              height={20}
+              color={
+                transaction.type === TRANSACTION_TYPE.CREDIT
+                  ? COLORS.creditGreen
+                  : COLORS.debitRed
+              }
+            />
+          </View>
         </Animated.View>
       </View>
     </Pressable>
@@ -139,9 +165,38 @@ const styles = StyleSheet.create({
     width: 50,
   },
   card: {
-    backgroundColor: COLORS.grey[900],
-    padding: 16,
+    display: 'flex',
+    flexDirection: 'row',
+    backgroundColor: COLORS.grey[800],
+    padding: 12,
     borderRadius: 8,
+    gap: 16,
+    alignItems: 'center',
+  },
+  cardContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+  cardDescription: {
+    fontFamily: FONTFAMILIES.LATO.medium,
+    fontSize: 14,
+    color: COLORS.grey[100],
+  },
+  cardMetaDetails: {
+    fontFamily: FONTFAMILIES.LATO.light,
+    fontSize: 12,
+    color: COLORS.grey[100],
+  },
+  cardAmountContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: 4,
+    alignItems: 'center',
+  },
+  cardAmount: {
+    fontFamily: FONTFAMILIES.LATO.medium,
+    fontSize: 20,
   },
   title: {
     fontFamily: FONTFAMILIES.LATO.bold,
