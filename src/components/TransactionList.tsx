@@ -1,5 +1,5 @@
 import React, {useMemo} from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {View, Text, SectionList, StyleSheet} from 'react-native';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import {EnrichedTransaction} from '../models/transactions';
@@ -9,10 +9,6 @@ import {FONTFAMILIES} from '../constants/fonts';
 
 dayjs.extend(relativeTime);
 
-
-// TODO
-// Add gap between the transaction history of any 2 days
-// Flat List is very glitchy. Find a alternative
 interface TransactionListProps {
   transactions: EnrichedTransaction[];
   onEdit: (id: number) => void;
@@ -21,7 +17,7 @@ interface TransactionListProps {
 }
 
 const groupTransactionsByDate = (transactions: EnrichedTransaction[]) => {
-  return transactions.reduce((groups, transaction) => {
+  const grouped = transactions.reduce((groups, transaction) => {
     const date = dayjs(transaction.created_at).startOf('day').toISOString();
     if (!groups[date]) {
       groups[date] = [];
@@ -29,6 +25,16 @@ const groupTransactionsByDate = (transactions: EnrichedTransaction[]) => {
     groups[date].push(transaction);
     return groups;
   }, {} as Record<string, EnrichedTransaction[]>);
+
+  // Sort dates (most recent first) and transactions within each group
+  return Object.keys(grouped)
+    .sort((a, b) => dayjs(b).diff(dayjs(a))) // Sort dates
+    .map(date => ({
+      title: date,
+      data: grouped[date].sort((a, b) =>
+        dayjs(b.created_at).diff(dayjs(a.created_at)),
+      ), // Sort transactions within each date
+    }));
 };
 
 const getDateLabel = (date: string) => {
@@ -38,7 +44,6 @@ const getDateLabel = (date: string) => {
   if (transactionDate.isSame(today, 'day')) {
     return 'Today';
   }
-
   if (transactionDate.isSame(today.subtract(1, 'day'), 'day')) {
     return 'Yesterday';
   }
@@ -52,79 +57,47 @@ const TransactionList: React.FC<TransactionListProps> = ({
   onDelete,
   onSelect,
 }) => {
-  // Group and sort transactions by date
-  const groupedTransactions = useMemo(
+  // Group transactions into sections by date
+  const sections = useMemo(
     () => groupTransactionsByDate(transactions),
     [transactions],
   );
-  const sortedDates = useMemo(
-    () =>
-      Object.keys(groupedTransactions).sort((a, b) => dayjs(b).diff(dayjs(a))),
-    [groupedTransactions],
+
+  // Render the section header (date label)
+  const renderSectionHeader = ({
+    section: {title},
+  }: {
+    section: {title: string};
+  }) => (
+    <View style={styles.stickyHeader}>
+      <Text style={styles.dateText}>{getDateLabel(title)}</Text>
+    </View>
   );
 
-  // Flatten data for a single FlatList
-  const flattenedData = useMemo(() => {
-    const data: Array<{
-      type: 'header' | 'item';
-      value: string | EnrichedTransaction;
-    }> = [];
-    sortedDates.forEach(date => {
-      data.push({type: 'header', value: date});
-      groupedTransactions[date]
-        .sort((a, b) => dayjs(b.created_at).diff(dayjs(a.created_at)))
-        .forEach(transaction => {
-          data.push({type: 'item', value: transaction});
-        });
-    });
-    return data;
-  }, [sortedDates, groupedTransactions]);
-
-  // Identify header indices for sticky headers
-  const stickyHeaderIndices = flattenedData
-    .map((item, index) => (item.type === 'header' ? index : null))
-    .filter(index => index !== null) as number[];
-
-  // Render a single item based on its type (header or transaction card)
-  const renderItem = ({
-    item,
-  }: {
-    item: {type: 'header' | 'item'; value: any};
-  }) => {
-    if (item.type === 'header') {
-      return (
-        <View style={styles.stickyHeader}>
-          <Text style={styles.dateText}>{getDateLabel(item.value)}</Text>
-        </View>
-      );
-    }
-
-    return (
-      <TransactionCard
-        transaction={item.value}
-        onEdit={onEdit}
-        onDelete={onDelete}
-        onSelect={onSelect}
-      />
-    );
-  };
+  // Render individual transaction items
+  const renderItem = ({item}: {item: EnrichedTransaction}) => (
+    <TransactionCard
+      transaction={item}
+      onEdit={onEdit}
+      onDelete={onDelete}
+      onSelect={onSelect}
+    />
+  );
 
   return (
-    <FlatList
-      data={flattenedData}
-      // TODO
-      // FIX THIS
-      keyExtractor={(_, __) => `item-${Math.random()}`}
-      //-----
+    <SectionList
+      sections={sections}
+      keyExtractor={(item, index) => item.id.toString() + index}
       renderItem={renderItem}
-      stickyHeaderIndices={stickyHeaderIndices}
-      stickyHeaderHiddenOnScroll={false}
-      // bounces={true}
+      renderSectionHeader={renderSectionHeader}
+      stickySectionHeadersEnabled
+      renderSectionFooter={() => <View style={styles.sectionSeparator} />}
     />
   );
 };
 
 const styles = StyleSheet.create({
+ 
   stickyHeader: {
     backgroundColor: COLORS.grey[800],
     paddingBottom: 8,
@@ -133,6 +106,12 @@ const styles = StyleSheet.create({
     fontFamily: FONTFAMILIES.LATO.bold,
     fontSize: 14,
     color: COLORS.grey[100],
+  },
+  sectionSeparator: {
+    height: 16,
+  },
+  itemSeparator: {
+    height: 8,
   },
 });
 
