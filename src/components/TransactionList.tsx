@@ -97,7 +97,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
 };
 
 const styles = StyleSheet.create({
- 
   stickyHeader: {
     backgroundColor: COLORS.grey[800],
     paddingBottom: 8,
