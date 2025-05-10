@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import GroupedExpensesList from '../../components/GroupedTransactionsList';
+import GroupedExpensesList from '../../components/TransactionList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
 import Textfield, {TEXTFIELD_SIZE} from '../../components/common/Textfield';
 import COLORS from '../../constants/colors';
