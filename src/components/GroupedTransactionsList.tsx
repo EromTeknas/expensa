@@ -37,9 +37,9 @@ const getDateLabel = (date: string) => {
   if (transactionDate.isSame(today, 'day')) {
     return 'Today';
   }
-  if (transactionDate.isSame(today.subtract(1, 'day'), 'day')) {
-    return 'Yesterday';
-  }
+  // if (transactionDate.isSame(today.subtract(1, 'day'), 'day')) {
+  //   return 'Yesterday';
+  // }
 
   return transactionDate.format('DD MMM, YYYY');
 };
@@ -113,7 +113,7 @@ const TransactionList: React.FC<TransactionListProps> = ({
       keyExtractor={(item, index) => `item-${index}`}
       renderItem={renderItem}
       stickyHeaderIndices={stickyHeaderIndices}
-      bounces={true}
+      // bounces={true}
     />
   );
 };
