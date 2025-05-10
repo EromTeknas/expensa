@@ -95,7 +95,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   });
 
   return (
-    <Pressable onPress={handleLongPress}>
+    // <Pressable onPress={handleLongPress}>
       <View style={styles.container}>
         <Animated.View style={[styles.backgroundLayer, {backgroundColor}]}>
           <View style={styles.editIcon}>
@@ -138,7 +138,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           </View>
         </Animated.View>
       </View>
-    </Pressable>
+    // </Pressable>
   );
 };
 
