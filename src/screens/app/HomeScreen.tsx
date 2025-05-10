@@ -37,6 +37,8 @@ const HomeScreen = () => {
     setDescription,
     handleCreditTransaction,
     handleDebitTransaction,
+    creditLoading,
+    debitLoading,
   } = useHomeScreen();
 
   return (
@@ -117,7 +119,8 @@ const HomeScreen = () => {
                 onPress={handleDebitTransaction}
                 size={BUTTON_SIZE.MEDIUM}
                 prefixIcon={ArrowUpRightIcon}
-                loading={transaction.transactionsLoading}
+                loading={debitLoading}
+                // loading={transaction.transactionsLoading}
                 style={{
                   backgroundColor: COLORS.debitRed,
                 }}
@@ -127,7 +130,8 @@ const HomeScreen = () => {
                 onPress={handleCreditTransaction}
                 size={BUTTON_SIZE.MEDIUM}
                 prefixIcon={ArrowDownLeftIcon}
-                loading={transaction.transactionsLoading}
+                loading={creditLoading}
+                // loading={transaction.transactionsLoading}
                 style={{
                   backgroundColor: COLORS.creditGreen,
                 }}

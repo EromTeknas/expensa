@@ -3,7 +3,12 @@ import {supabase} from '../services/supbaseClient';
 import {Account} from './accounts';
 import {Category} from './categories';
 import {PostgrestError} from '@supabase/supabase-js';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
+dayjs.extend(utc);
+dayjs.extend(timezone);
 export type TransactionType = Database['public']['Enums']['transaction_type'];
 
 export const TRANSACTION_TYPE: Record<'CREDIT' | 'DEBIT', TransactionType> = {
@@ -56,8 +61,15 @@ export const fetchTransactionsByDate = async (
   data: EnrichedTransaction[] | null;
   error: PostgrestError | null;
 }> => {
-  const startOfDay = `${specificDate}T00:00:00Z`;
-  const endOfDay = `${specificDate}T23:59:59Z`;
+  // Convert specificDate to UTC start and end times
+  const startOfDay = dayjs
+    .tz(`${specificDate}T00:00:00`, 'Asia/Kolkata')
+    .utc()
+    .toISOString();
+  const endOfDay = dayjs
+    .tz(`${specificDate}T23:59:59`, 'Asia/Kolkata')
+    .utc()
+    .toISOString();
 
   console.log('ByDate', specificDate, startOfDay, endOfDay);
   const {data, error} = await supabase
@@ -86,8 +98,15 @@ export const fetchTransactionsByDateRange = async (
   data: EnrichedTransaction[] | null;
   error: PostgrestError | null;
 }> => {
-  const startDateTime = `${startDate}T00:00:00Z`;
-  const endDateTime = `${endDate}T23:59:59Z`;
+  // Convert specificDate to UTC start and end times
+  const startDateTime = dayjs
+    .tz(`${startDate}T00:00:00`, 'Asia/Kolkata')
+    .utc()
+    .toISOString();
+  const endDateTime = dayjs
+    .tz(`${endDate}T23:59:59`, 'Asia/Kolkata')
+    .utc()
+    .toISOString();
 
   const {data, error} = await supabase
     .from('transactions')

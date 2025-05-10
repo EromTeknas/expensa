@@ -88,28 +88,61 @@ export const fetchAllTransactionsThunk = createAsyncThunk<
   },
 );
 
-// Add a transaction and refetch the full list
+// Add a transaction and refetch the specified list
 export const addTransactionThunk = createAsyncThunk<
   EnrichedTransaction[],
-  NewTransaction,
+  {
+    newTransaction: NewTransaction;
+    fetchOptions?: {
+      date?: string; // Specific date (YYYY-MM-DD)
+      startDate?: string; // Start date for a range (YYYY-MM-DD)
+      endDate?: string; // End date for a range (YYYY-MM-DD)
+    };
+  },
   {rejectValue: string}
 >(
   'home/addTransaction',
-  async (newTransaction: NewTransaction, {rejectWithValue}) => {
+  async ({newTransaction, fetchOptions}, {rejectWithValue}) => {
+    console.log('newtran', newTransaction);
+    console.log('fetch options', fetchOptions);
+    // Add the transaction
     const {error: addError} = await addTransaction(newTransaction);
 
     if (addError) {
+      console.log(addError);
       return rejectWithValue(addError.message ?? 'Failed to add transaction');
     }
 
-    // Fetch updated transactions after insert
-    const {data: allTransactionsData, error: fetchError} =
-      await fetchAllTransactions(newTransaction.user_id);
+    let data: EnrichedTransaction[] | null = null;
+    let error: PostgrestError | null = null;
 
-    if (fetchError) {
-      return rejectWithValue(fetchError.message);
+    // Check for specific date
+    if (fetchOptions?.date) {
+      console.log('specific Date');
+      ({data, error} = await fetchTransactionsByDate(
+        newTransaction.user_id,
+        fetchOptions.date,
+      ));
+    }
+    // Check for date range
+    else if (fetchOptions?.startDate && fetchOptions.endDate) {
+      console.log('Date Range');
+      ({data, error} = await fetchTransactionsByDateRange(
+        newTransaction.user_id,
+        fetchOptions.startDate,
+        fetchOptions.endDate,
+      ));
+    }
+    // Fetch all transactions if no date or range is specified
+    else {
+      console.log('All Transactions');
+      ({data, error} = await fetchAllTransactions(newTransaction.user_id));
     }
 
-    return allTransactionsData ?? [];
+    if (error) {
+      return rejectWithValue(error.message ?? 'Failed to fetch transactions');
+    }
+
+    return data ?? [];
   },
 );

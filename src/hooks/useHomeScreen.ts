@@ -20,12 +20,13 @@ export const useHomeScreen = () => {
   const [selectedAccount, setSelectedAccount] = useState<string>();
   const [amount, setAmount] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-
+  const [creditLoading, setCreditLoading] = useState<boolean>(false);
+  const [debitLoading, setDebitLoading] = useState<boolean>(false);
+  const todaysDate = dayjs().format('YYYY-MM-DD');
   // Fetch categories, accounts, and transactions
   useEffect(() => {
     if (!user?.id) return;
 
-    const todaysDate = dayjs().format('YYYY-MM-DD');
     dispatch(fetchAllCategoriesThunk(user.id));
     dispatch(fetchAllAccountsThunk(user.id));
     dispatch(
@@ -34,7 +35,7 @@ export const useHomeScreen = () => {
         date: todaysDate,
       }),
     );
-  }, [dispatch, user]);
+  }, [dispatch, user, todaysDate]);
 
   // Auto select first category
   useEffect(() => {
@@ -50,13 +51,16 @@ export const useHomeScreen = () => {
     }
   }, [account.accounts]);
 
-  const handleAddTransaction = (transactionType: TransactionType) => {
+  const handleAddTransaction = async (
+    transactionType: TransactionType,
+    setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  ) => {
     // If User Id is not found. Logout.
     if (!user?.id) {
       dispatch(logoutThunk());
+      return;
     }
 
-    // This is not at all likely to happen as we select the Category and Account bydefault and user.id is also checked
     if (!selectedCategory || !selectedAccount || !user?.id) {
       return;
     }
@@ -65,7 +69,6 @@ export const useHomeScreen = () => {
 
     // Validate that the amount is not null, 0, or negative
     if (isNaN(transactionAmount) || transactionAmount <= 0) {
-      // Show an error message (you can replace this with your preferred way to show errors)
       showToast({
         message: 'Please enter a valid amount',
         type: 'error',
@@ -73,25 +76,48 @@ export const useHomeScreen = () => {
       return;
     }
 
-    return dispatch(
-      addTransactionThunk({
-        amount: parseFloat(amount),
-        user_id: user.id,
-        category_id: selectedCategory,
-        account_id: selectedAccount,
-        description,
-        type: transactionType, // CREDIT or DEBIT
-      }),
-    ).finally(() => {
+    // Start loading
+    setLoading(true);
+
+    try {
+      await dispatch(
+        addTransactionThunk({
+          newTransaction: {
+            amount: transactionAmount,
+            user_id: user.id,
+            category_id: selectedCategory,
+            account_id: selectedAccount,
+            description,
+            type: transactionType,
+          },
+          fetchOptions: {
+            date: todaysDate,
+          },
+        }),
+      ).unwrap();
+
+      showToast({
+        message: 'Transaction added successfully',
+        type: 'success',
+      });
+
       setAmount('');
       setDescription('');
-    });
+    } catch (error) {
+      showToast({
+        message: 'Failed to add transaction',
+        type: 'error',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreditTransaction = () =>
-    handleAddTransaction(TRANSACTION_TYPE.CREDIT);
+    handleAddTransaction(TRANSACTION_TYPE.CREDIT, setCreditLoading);
+
   const handleDebitTransaction = () =>
-    handleAddTransaction(TRANSACTION_TYPE.DEBIT);
+    handleAddTransaction(TRANSACTION_TYPE.DEBIT, setDebitLoading);
 
   return {
     category,
@@ -107,5 +133,7 @@ export const useHomeScreen = () => {
     setDescription,
     handleCreditTransaction,
     handleDebitTransaction,
+    creditLoading,
+    debitLoading,
   };
 };
