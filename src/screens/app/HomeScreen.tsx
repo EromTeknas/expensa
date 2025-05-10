@@ -1,13 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableWithoutFeedback,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Animated,
 } from 'react-native';
 import GroupedExpensesList from '../../components/GroupedTransactionsList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
@@ -41,120 +38,117 @@ const HomeScreen = () => {
     handleCreditTransaction,
     handleDebitTransaction,
   } = useHomeScreen();
-  const [scrollY] = useState(new Animated.Value(0));
 
-  const collapseHeight = scrollY.interpolate({
-    inputRange: [0, 150],
-    outputRange: [200, 0],
-    extrapolate: 'clamp',
-  });
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView
-        style={{flex: 1}}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={styles.outerContainer}>
-          <TotalTransactionsStatus
-            transactions={[
-              {label: 'This Month', amount: 10000},
-              {label: 'This Week', amount: 5000},
-            ]}
-          />
-          <View style={styles.addTransactionSection}>
-            <View style={styles.addTransactionSectionHeader}>
-              <Text style={styles.sectionHeader}>Add Transaction</Text>
-              <DateTimePickerComponent
-                onDateChange={date => console.log('Selected Date:', date)}
-              />
+    <KeyboardAvoidingView
+      style={{flex: 1}}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={styles.outerContainer}>
+        <TotalTransactionsStatus
+          transactions={[
+            {label: 'This Month', amount: 10000},
+            {label: 'This Week', amount: 5000},
+          ]}
+        />
+        <View style={styles.addTransactionSection}>
+          <View style={styles.addTransactionSectionHeader}>
+            <Text style={styles.sectionHeader}>Add Transaction</Text>
+            <DateTimePickerComponent
+              onDateChange={date => console.log('Selected Date:', date)}
+            />
+          </View>
+          <View style={styles.addTransactionInnerSection}>
+            <View style={styles.row}>
+              {category.categoriesError ? (
+                <Text>{category.categoriesError}</Text>
+              ) : (
+                <Dropdown
+                  items={category.categories}
+                  schema={{label: 'name', value: 'id'}}
+                  value={selectedCategory!}
+                  size={DROPDOWN_SIZE.SMALL}
+                  label={'Category'}
+                  onSelect={catId =>
+                    setSelectedCategory(
+                      category.categories.find(c => c.id === catId)?.id,
+                    )
+                  }
+                />
+              )}
+              {account.accountsError ? (
+                <Text>{account.accountsError}</Text>
+              ) : (
+                <Dropdown
+                  items={account.accounts}
+                  schema={{label: 'name', value: 'id'}}
+                  value={selectedAccount!}
+                  size={DROPDOWN_SIZE.SMALL}
+                  label={'Account'}
+                  onSelect={accId =>
+                    setSelectedAccount(
+                      account.accounts.find(a => a.id === accId)?.id,
+                    )
+                  }
+                />
+              )}
             </View>
-            <View style={styles.addTransactionInnerSection}>
-              <View style={styles.row}>
-                {category.categoriesError ? (
-                  <Text>{category.categoriesError}</Text>
-                ) : (
-                  <Dropdown
-                    items={category.categories}
-                    schema={{label: 'name', value: 'id'}}
-                    value={selectedCategory!}
-                    size={DROPDOWN_SIZE.SMALL}
-                    label={'Category'}
-                    onSelect={catId =>
-                      setSelectedCategory(
-                        category.categories.find(c => c.id === catId)?.id,
-                      )
-                    }
-                  />
-                )}
-                {account.accountsError ? (
-                  <Text>{account.accountsError}</Text>
-                ) : (
-                  <Dropdown
-                    items={account.accounts}
-                    schema={{label: 'name', value: 'id'}}
-                    value={selectedAccount!}
-                    size={DROPDOWN_SIZE.SMALL}
-                    label={'Account'}
-                    onSelect={accId =>
-                      setSelectedAccount(
-                        account.accounts.find(a => a.id === accId)?.id,
-                      )
-                    }
-                  />
-                )}
-              </View>
-              <Textfield
-                value={amount}
-                size={TEXTFIELD_SIZE.MEDIUM}
-                placeholder={'Enter Amount'}
-                label={'Amount'}
-                prefixIcon={CurrencyRupeeIcon}
-                onChangeText={amt => setAmount(amt)}
-                keyboardType={'number-pad'}
+            <Textfield
+              value={amount}
+              size={TEXTFIELD_SIZE.MEDIUM}
+              placeholder={'Enter Amount'}
+              label={'Amount'}
+              prefixIcon={CurrencyRupeeIcon}
+              onChangeText={amt => setAmount(amt)}
+              keyboardType={'number-pad'}
+            />
+            <Textfield
+              value={description}
+              size={TEXTFIELD_SIZE.SMALL}
+              placeholder={'Enter Description'}
+              label={'Description'}
+              prefixIcon={CardTextIcon}
+              onChangeText={des => setDescription(des)}
+              multiline={true}
+              numberOfLines={5}
+            />
+            <View style={styles.buttonRow}>
+              <Button
+                label="Debit"
+                onPress={handleDebitTransaction}
+                size={BUTTON_SIZE.MEDIUM}
+                prefixIcon={ArrowUpRightIcon}
+                loading={transaction.transactionsLoading}
+                style={{
+                  backgroundColor: COLORS.debitRed,
+                }}
               />
-              <Textfield
-                value={description}
-                size={TEXTFIELD_SIZE.SMALL}
-                placeholder={'Enter Description'}
-                label={'Description'}
-                prefixIcon={CardTextIcon}
-                onChangeText={des => setDescription(des)}
-                multiline={true}
-                numberOfLines={5}
+              <Button
+                label="Credit"
+                onPress={handleCreditTransaction}
+                size={BUTTON_SIZE.MEDIUM}
+                prefixIcon={ArrowDownLeftIcon}
+                loading={transaction.transactionsLoading}
+                style={{
+                  backgroundColor: COLORS.creditGreen,
+                }}
               />
-              <View style={styles.buttonRow}>
-                <Button
-                  label="Debit"
-                  onPress={handleDebitTransaction}
-                  size={BUTTON_SIZE.MEDIUM}
-                  prefixIcon={ArrowUpRightIcon}
-                  loading={transaction.transactionsLoading}
-                  style={{
-                    backgroundColor: COLORS.debitRed,
-                  }}
-                />
-                <Button
-                  label="Credit"
-                  onPress={handleCreditTransaction}
-                  size={BUTTON_SIZE.MEDIUM}
-                  prefixIcon={ArrowDownLeftIcon}
-                  loading={transaction.transactionsLoading}
-                  style={{
-                    backgroundColor: COLORS.creditGreen,
-                  }}
-                />
-                {transaction.transactionsError && (
-                  <Text style={styles.errorText}>
-                    {transaction.transactionsError}
-                  </Text>
-                )}
-              </View>
+              {transaction.transactionsError && (
+                <Text style={styles.errorText}>
+                  {transaction.transactionsError}
+                </Text>
+              )}
             </View>
           </View>
-
-          <GroupedExpensesList transactions={transaction.transactions} />
         </View>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+
+        <GroupedExpensesList
+          transactions={transaction.transactions}
+          onDelete={() => {}}
+          onEdit={() => {}}
+          onSelect={() => {}}
+        />
+      </View>
+    </KeyboardAvoidingView>
   );
 };
 

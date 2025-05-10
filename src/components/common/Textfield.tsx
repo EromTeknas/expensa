@@ -15,6 +15,7 @@ import {SvgProps} from 'react-native-svg';
 
 // TODO
 // When textfield is inactive but user has entered some value into it, the color of text and icons should be white
+// Implement TouchableWithoutFeedback here
 export enum TEXTFIELD_SIZE {
   LARGE,
   MEDIUM,
