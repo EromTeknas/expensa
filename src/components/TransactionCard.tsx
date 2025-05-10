@@ -192,7 +192,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                           : COLORS.debitRed,
                     },
                   ]}>
-                  {formatRupee(100, 2)}
+                  {formatRupee(transaction.amount, 2)}
                 </Text>
                 <CurrencyRupeeIcon
                   width={20}

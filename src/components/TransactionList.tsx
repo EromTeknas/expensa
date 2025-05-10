@@ -12,6 +12,7 @@ dayjs.extend(relativeTime);
 
 // TODO
 // Add gap between the transaction history of any 2 days
+// Flat List is very glitchy. Find a alternative
 interface TransactionListProps {
   transactions: EnrichedTransaction[];
   onEdit: (id: number) => void;
@@ -37,9 +38,10 @@ const getDateLabel = (date: string) => {
   if (transactionDate.isSame(today, 'day')) {
     return 'Today';
   }
-  // if (transactionDate.isSame(today.subtract(1, 'day'), 'day')) {
-  //   return 'Yesterday';
-  // }
+
+  if (transactionDate.isSame(today.subtract(1, 'day'), 'day')) {
+    return 'Yesterday';
+  }
 
   return transactionDate.format('DD MMM, YYYY');
 };
@@ -110,9 +112,13 @@ const TransactionList: React.FC<TransactionListProps> = ({
   return (
     <FlatList
       data={flattenedData}
-      keyExtractor={(item, index) => `item-${index}`}
+      // TODO
+      // FIX THIS
+      keyExtractor={(_, __) => `item-${Math.random()}`}
+      //-----
       renderItem={renderItem}
       stickyHeaderIndices={stickyHeaderIndices}
+      stickyHeaderHiddenOnScroll={false}
       // bounces={true}
     />
   );
