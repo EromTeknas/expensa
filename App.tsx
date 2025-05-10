@@ -8,6 +8,8 @@ import {supabase} from './src/services/supbaseClient';
 import {setUser} from './src/features/auth/authSlice';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import COLORS from './src/constants/colors';
+import Toast from 'react-native-toast-message';
+import toastConfig from './src/configs/toastConfig';
 
 function App(): React.JSX.Element {
   useEffect(() => {
@@ -31,6 +33,7 @@ function App(): React.JSX.Element {
           <NavigationContainer>
             {/* Replace this with navigation later */}
             <LoginScreen />
+            <Toast config={toastConfig} />
           </NavigationContainer>
         </SafeAreaView>
       </AuthProvider>

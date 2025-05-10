@@ -8,6 +8,8 @@ import {
 } from '../features/home/homeThunk';
 import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
 import dayjs from 'dayjs';
+import showToast from '../utils/toast';
+import {logoutThunk} from '../features/auth/authThunk';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -16,8 +18,8 @@ export const useHomeScreen = () => {
 
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [selectedAccount, setSelectedAccount] = useState<string>();
-  const [amount, setAmount] = useState('0');
-  const [description, setDescription] = useState('');
+  const [amount, setAmount] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
 
   // Fetch categories, accounts, and transactions
   useEffect(() => {
@@ -49,7 +51,27 @@ export const useHomeScreen = () => {
   }, [account.accounts]);
 
   const handleAddTransaction = (transactionType: TransactionType) => {
-    if (!selectedCategory || !selectedAccount || !user?.id) return;
+    // If User Id is not found. Logout.
+    if (!user?.id) {
+      dispatch(logoutThunk());
+    }
+
+    // This is not at all likely to happen as we select the Category and Account bydefault and user.id is also checked
+    if (!selectedCategory || !selectedAccount || !user?.id) {
+      return;
+    }
+
+    const transactionAmount = parseFloat(amount);
+
+    // Validate that the amount is not null, 0, or negative
+    if (isNaN(transactionAmount) || transactionAmount <= 0) {
+      // Show an error message (you can replace this with your preferred way to show errors)
+      showToast({
+        message: 'Please enter a valid amount',
+        type: 'error',
+      });
+      return;
+    }
 
     return dispatch(
       addTransactionThunk({
