@@ -5,8 +5,11 @@ import {
   addTransaction,
   EnrichedTransaction,
   fetchAllTransactions,
+  fetchTransactionsByDate,
+  fetchTransactionsByDateRange,
   NewTransaction,
 } from '../../models/transactions';
+import {PostgrestError} from '@supabase/supabase-js';
 
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
@@ -35,20 +38,55 @@ export const fetchAllAccountsThunk = createAsyncThunk<
   return data ?? [];
 });
 
-// Fetch all transactions for a user
+// Updated thunk to fetch transactions based on user input
 export const fetchAllTransactionsThunk = createAsyncThunk<
   EnrichedTransaction[],
-  string | null,
+  {
+    userId: string;
+    date?: string; // Specific date (YYYY-MM-DD)
+    startDate?: string; // Start date for a range (YYYY-MM-DD)
+    endDate?: string; // End date for a range (YYYY-MM-DD)
+  },
   {rejectValue: string}
->('home/fetchAllTransactions', async (userId, {rejectWithValue}) => {
-  const {data, error} = await fetchAllTransactions(userId!);
+>(
+  'home/fetchAllTransactions',
+  async ({userId, date, startDate, endDate}, {rejectWithValue}) => {
+    try {
+      let data: EnrichedTransaction[] | null = null;
+      let error: PostgrestError | null = null;
 
-  if (error) {
-    return rejectWithValue(error.message);
-  }
+      // Check for specific date
+      if (date) {
+        console.log('specific Date');
+        ({data, error} = await fetchTransactionsByDate(userId, date));
+      }
+      // Check for date range
+      else if (startDate && endDate) {
+        console.log('Date Range');
+        ({data, error} = await fetchTransactionsByDateRange(
+          userId,
+          startDate,
+          endDate,
+        ));
+      }
+      // Fetch all transactions if no date or range is specified
+      else {
+        console.log('All Transactions');
+        ({data, error} = await fetchAllTransactions(userId));
+      }
 
-  return data ?? [];
-});
+      if (error) {
+        console.log(error);
+        return rejectWithValue(error.message);
+      }
+
+      return data ?? [];
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue('Failed to fetch transactions.');
+    }
+  },
+);
 
 // Add a transaction and refetch the full list
 export const addTransactionThunk = createAsyncThunk<

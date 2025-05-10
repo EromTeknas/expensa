@@ -7,6 +7,7 @@ import {
   addTransactionThunk,
 } from '../features/home/homeThunk';
 import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
+import dayjs from 'dayjs';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -22,9 +23,15 @@ export const useHomeScreen = () => {
   useEffect(() => {
     if (!user?.id) return;
 
+    const todaysDate = dayjs().format('YYYY-MM-DD');
     dispatch(fetchAllCategoriesThunk(user.id));
     dispatch(fetchAllAccountsThunk(user.id));
-    dispatch(fetchAllTransactionsThunk(user.id));
+    dispatch(
+      fetchAllTransactionsThunk({
+        userId: user.id,
+        date: todaysDate,
+      }),
+    );
   }, [dispatch, user]);
 
   // Auto select first category

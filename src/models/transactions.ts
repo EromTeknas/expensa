@@ -43,7 +43,65 @@ export const fetchAllTransactions = async (
     `,
     )
     .eq('user_id', userId)
-    .order('created_at', {ascending: true});
+    .order('transaction_time', {ascending: false});
+
+  return {data, error};
+};
+
+// Fetch transactions for a specific date
+export const fetchTransactionsByDate = async (
+  userId: string,
+  specificDate: string,
+): Promise<{
+  data: EnrichedTransaction[] | null;
+  error: PostgrestError | null;
+}> => {
+  const startOfDay = `${specificDate}T00:00:00Z`;
+  const endOfDay = `${specificDate}T23:59:59Z`;
+
+  console.log('ByDate', specificDate, startOfDay, endOfDay);
+  const {data, error} = await supabase
+    .from('transactions')
+    .select(
+      `
+      *,
+      account:account_id ( id, name ),
+      category:category_id ( id, name )
+    `,
+    )
+    .eq('user_id', userId)
+    .gte('transaction_time', startOfDay)
+    .lte('transaction_time', endOfDay)
+    .order('transaction_time', {ascending: false}); // Most recent first
+
+  return {data, error};
+};
+
+// Fetch transactions within a date range
+export const fetchTransactionsByDateRange = async (
+  userId: string,
+  startDate: string,
+  endDate: string,
+): Promise<{
+  data: EnrichedTransaction[] | null;
+  error: PostgrestError | null;
+}> => {
+  const startDateTime = `${startDate}T00:00:00Z`;
+  const endDateTime = `${endDate}T23:59:59Z`;
+
+  const {data, error} = await supabase
+    .from('transactions')
+    .select(
+      `
+      *,
+      account:account_id ( id, name ),
+      category:category_id ( id, name )
+    `,
+    )
+    .eq('user_id', userId)
+    .gte('transaction_time', startDateTime)
+    .lte('transaction_time', endDateTime)
+    .order('transaction_time', {ascending: false}); // Most recent first
 
   return {data, error};
 };
