@@ -146,3 +146,16 @@ export const fetchTransactionSum = async (
   console.log('sum', sum);
   return sum;
 };
+
+// Add a new transaction
+export const deleteTransaction = async (transactionId: number) => {
+  console.log('inside delete ransationc ', transactionId);
+
+  const {error} = await supabase
+    .from('transactions')
+    .delete()
+    .eq('id', transactionId);
+
+  console.log(error);
+  return {error};
+};

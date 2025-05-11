@@ -3,6 +3,7 @@ import {Category, fetchAllCategories} from '../../models/categories';
 import {Account, fetchAllAccounts} from '../../models/accounts';
 import {
   addTransaction,
+  deleteTransaction,
   EnrichedTransaction,
   fetchAllTransactions,
   fetchTransactionsByDate,
@@ -192,5 +193,26 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
         ? error.message
         : 'Failed to fetch transaction sums',
     );
+  }
+});
+
+export const deleteTransactionThunk = createAsyncThunk<
+  number, // Return type (transaction ID on success)
+  number, // Argument type (transaction ID)
+  {rejectValue: string} // Rejection type (error message)
+>('home/deleteTransaction', async (transactionId, {rejectWithValue}) => {
+  try {
+    const {error} = await deleteTransaction(transactionId);
+
+    if (error) {
+      console.error('Error deleting transaction:', error.message);
+
+      return rejectWithValue(error.message);
+    }
+
+    return transactionId;
+  } catch (err) {
+    console.error('Unexpected error deleting transaction:', err);
+    return rejectWithValue('Unexpected error occurred');
   }
 });

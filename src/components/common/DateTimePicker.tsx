@@ -11,6 +11,10 @@ import {formatTimeWithDate, isNow} from '../../utils/dateTimeUtilities';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+//TODO
+// If we set time to 'NOW' on 11.50 PM
+// If 5 min past, the label is shown Now, but the time stored in state is still 11.50
+// We need to implement the provision, if the NOW is displayed, then the time picked should be current
 type DateTimePickerComponentProps = {
   selectedDate: Date;
   onDateChange: (date: Date) => void;

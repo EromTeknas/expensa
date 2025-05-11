@@ -42,6 +42,8 @@ const HomeScreen = () => {
     transactionTime,
     setTransactionTime,
     meta,
+    handleDeleteTransaction,
+    transactions,
   } = useHomeScreen();
 
   return (
@@ -154,10 +156,10 @@ const HomeScreen = () => {
         </View>
 
         <GroupedExpensesList
-          transactions={transaction.transactions}
-          onDelete={() => {}}
-          onEdit={() => {}}
-          onSelect={() => {}}
+          transactions={transactions}
+          onDelete={handleDeleteTransaction}
+          onEdit={id => {}}
+          onSelect={id => {}}
         />
       </View>
     </KeyboardAvoidingView>

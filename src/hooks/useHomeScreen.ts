@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import {useAppDispatch, useAppSelector} from '../app/hooks';
 import {
   fetchAllCategoriesThunk,
@@ -6,8 +6,13 @@ import {
   fetchAllTransactionsThunk,
   addTransactionThunk,
   fetchTransactionSumsThunk,
+  deleteTransactionThunk,
 } from '../features/home/homeThunk';
-import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
+import {
+  EnrichedTransaction,
+  TRANSACTION_TYPE,
+  TransactionType,
+} from '../models/transactions';
 import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
@@ -29,6 +34,11 @@ export const useHomeScreen = () => {
   const [transactionTime, setTransactionTime] = useState<Date>(
     getCurrentDateInUTCDate(),
   );
+  const [transactions, setTransactions] = useState<EnrichedTransaction[]>(
+    transaction.transactions,
+  );
+
+  const softDeletedTransactionRef = useRef<number | null>(null);
 
   const todaysDate = dayjs().format('YYYY-MM-DD');
   // Fetch categories, accounts, and transactions
@@ -61,6 +71,9 @@ export const useHomeScreen = () => {
     }
   }, [account.accounts]);
 
+  useEffect(() => {
+    setTransactions(transaction.transactions);
+  }, [transaction.transactions]);
   const handleAddTransaction = async (
     transactionType: TransactionType,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -82,6 +95,12 @@ export const useHomeScreen = () => {
       showToast({
         message: 'Please enter a valid amount',
         type: 'error',
+        trailingButton: {
+          label: 'abc',
+          onPress: () => {
+            console.log('abc');
+          },
+        },
       });
       return;
     }
@@ -131,6 +150,60 @@ export const useHomeScreen = () => {
   const handleDebitTransaction = () =>
     handleAddTransaction(TRANSACTION_TYPE.DEBIT, setDebitLoading);
 
+  const handleDeleteTransaction = async (transactionId: number) => {
+    let deletedTransactionIndex = transactions.findIndex(
+      (tr, _) => tr.id === transactionId,
+    );
+
+    let deletedTransaction = transactions[deletedTransactionIndex];
+
+    // Remove from the list immediately
+    softDeletedTransactionRef.current = transactionId;
+
+    setTransactions(prev => prev.filter(t => t.id !== transactionId));
+
+    // Show undo toast
+    showToast({
+      message: 'Transaction deleted',
+      type: 'info',
+      trailingButton: {
+        label: 'Undo',
+        onPress: () => {
+          console.log('undo');
+          undoDelete(deletedTransaction, deletedTransactionIndex);
+        },
+      },
+      afterToastCallback: async () => {
+        // Check if the transaction was restored
+        if (softDeletedTransactionRef.current === transactionId) {
+          try {
+            await dispatch(deleteTransactionThunk(deletedTransaction.id));
+          } catch (error) {
+            showToast({message: 'Failed to delete transaction', type: 'error'});
+            // Restore on failure
+            setTransactions(prev => {
+              const updatedTransactions = [...prev];
+              updatedTransactions.splice(
+                deletedTransactionIndex,
+                0,
+                deletedTransaction,
+              );
+              return updatedTransactions;
+            });
+          }
+        }
+      },
+    });
+  };
+  const undoDelete = (tr: EnrichedTransaction, trIndex: number) => {
+    setTransactions(prev => {
+      const updatedTransactions = [...prev];
+      updatedTransactions.splice(trIndex, 0, tr);
+      return updatedTransactions;
+    });
+    softDeletedTransactionRef.current = null;
+  };
+
   return {
     category,
     account,
@@ -150,5 +223,7 @@ export const useHomeScreen = () => {
     transactionTime,
     setTransactionTime,
     meta,
+    handleDeleteTransaction,
+    transactions,
   };
 };

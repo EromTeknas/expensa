@@ -26,7 +26,7 @@ const toastConfig: ToastConfig = {
         props.props.trailingButton ? (
           <ToastButton
             label={props.props.trailingButton.label}
-            onPress={props.props.onPress}
+            onPress={props.props.trailingButton.onPress}
           />
         ) : null
       }
@@ -41,7 +41,7 @@ const toastConfig: ToastConfig = {
         props.props.trailingButton ? (
           <ToastButton
             label={props.props.trailingButton.label}
-            onPress={props.props.onPress}
+            onPress={props.props.trailingButton.onPress}
           />
         ) : null
       }
@@ -56,7 +56,7 @@ const toastConfig: ToastConfig = {
         props.props.trailingButton ? (
           <ToastButton
             label={props.props.trailingButton.label}
-            onPress={props.props.onPress}
+            onPress={props.props.trailingButton.onPress}
           />
         ) : null
       }
