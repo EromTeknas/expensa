@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
 import {getCurrentDateInUTCDate} from '../utils/dateTimeUtilities';
+import Toast from 'react-native-toast-message';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -202,6 +203,7 @@ export const useHomeScreen = () => {
       return updatedTransactions;
     });
     softDeletedTransactionRef.current = null;
+    Toast.hide();
   };
 
   return {
