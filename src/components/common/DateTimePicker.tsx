@@ -7,23 +7,23 @@ import HapticFeedback from 'react-native-haptic-feedback';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import {formatTimeWithDate} from '../../utils/dateTimeUtilities';
+import {formatTimeWithDate, isNow} from '../../utils/dateTimeUtilities';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 type DateTimePickerComponentProps = {
+  selectedDate: Date;
   onDateChange: (date: Date) => void;
 };
 
 const DateTimePickerComponent = ({
+  selectedDate,
   onDateChange,
 }: DateTimePickerComponentProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showPicker, setShowPicker] = useState(false);
 
   const setToNow = () => {
     const now = new Date();
-    setSelectedDate(now);
     onDateChange(now); // Callback with current date
   };
 
@@ -34,26 +34,14 @@ const DateTimePickerComponent = ({
 
   const handleDateChange = (date: Date) => {
     const utcDate = dayjs(date).utc().toDate(); // Convert selected date to UTC
-    setSelectedDate(utcDate);
     onDateChange(utcDate); // Callback when date changes
-  };
-
-  const isNow = () => {
-    const now = new Date();
-    return (
-      selectedDate.getDate() === now.getDate() &&
-      selectedDate.getMonth() === now.getMonth() &&
-      selectedDate.getFullYear() === now.getFullYear() &&
-      selectedDate.getHours() === now.getHours() &&
-      selectedDate.getMinutes() === now.getMinutes()
-    );
   };
 
   return (
     <View>
       <View style={styles.outerContainer}>
         <Text style={styles.timeTextStyle}>
-          {isNow() ? 'Now' : formatTimeWithDate(selectedDate)} |{' '}
+          {isNow(selectedDate) ? 'Now' : formatTimeWithDate(selectedDate)} |{' '}
         </Text>
         <TouchableOpacity
           onPress={() => setShowPicker(true)}

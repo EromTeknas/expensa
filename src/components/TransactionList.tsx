@@ -18,7 +18,9 @@ interface TransactionListProps {
 
 const groupTransactionsByDate = (transactions: EnrichedTransaction[]) => {
   const grouped = transactions.reduce((groups, transaction) => {
-    const date = dayjs(transaction.created_at).startOf('day').toISOString();
+    const date = dayjs(transaction.transaction_time)
+      .startOf('day')
+      .toISOString();
     if (!groups[date]) {
       groups[date] = [];
     }
@@ -32,7 +34,7 @@ const groupTransactionsByDate = (transactions: EnrichedTransaction[]) => {
     .map(date => ({
       title: date,
       data: grouped[date].sort((a, b) =>
-        dayjs(b.created_at).diff(dayjs(a.created_at)),
+        dayjs(b.transaction_time).diff(dayjs(a.transaction_time)),
       ), // Sort transactions within each date
     }));
 };

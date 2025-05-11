@@ -10,7 +10,7 @@ import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
 import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
-import {getCurrentDateInUTC} from '../utils/dateTimeUtilities';
+import {getCurrentDateInUTCDate} from '../utils/dateTimeUtilities';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -23,8 +23,8 @@ export const useHomeScreen = () => {
   const [description, setDescription] = useState<string>('');
   const [creditLoading, setCreditLoading] = useState<boolean>(false);
   const [debitLoading, setDebitLoading] = useState<boolean>(false);
-  const [transactionTime, setTransactionTime] = useState<string>(
-    getCurrentDateInUTC(),
+  const [transactionTime, setTransactionTime] = useState<Date>(
+    getCurrentDateInUTCDate(),
   );
 
   const todaysDate = dayjs().format('YYYY-MM-DD');
@@ -83,6 +83,7 @@ export const useHomeScreen = () => {
       return;
     }
 
+    console.log('Transaction Time ', transactionTime.toISOString());
     // Start loading
     setLoading(true);
 
@@ -96,6 +97,7 @@ export const useHomeScreen = () => {
             account_id: selectedAccount,
             description,
             type: transactionType,
+            transaction_time: transactionTime.toISOString(),
           },
           fetchOptions: {
             date: todaysDate,

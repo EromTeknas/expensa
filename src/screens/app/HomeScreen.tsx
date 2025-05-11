@@ -58,7 +58,8 @@ const HomeScreen = () => {
           <View style={styles.addTransactionSectionHeader}>
             <Text style={styles.sectionHeader}>Add Transaction</Text>
             <DateTimePickerComponent
-              onDateChange={date => console.log('Selected Date:', date)}
+              selectedDate={transactionTime}
+              onDateChange={date => setTransactionTime(date)}
             />
           </View>
           <View style={styles.addTransactionInnerSection}>

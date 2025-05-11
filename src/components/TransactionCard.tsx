@@ -178,7 +178,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 <Text style={styles.cardDescription}>{displayText()}</Text>
                 <Text style={styles.cardMetaDetails}>
                   {transaction.account.name} |{' '}
-                  {formatTo12HourTime(transaction.created_at)}
+                  {formatTo12HourTime(transaction.transaction_time)}
                 </Text>
               </View>
               <View style={styles.cardAmountContainer}>

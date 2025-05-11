@@ -13,6 +13,9 @@ dayjs.extend(relativeTime);
 export const getCurrentDateInUTC = (): string => {
   return dayjs().utc().format();
 };
+export const getCurrentDateInUTCDate = (): Date => {
+  return dayjs().utc().toDate();
+};
 
 /**
  * Convert a local date to UTC
@@ -20,6 +23,10 @@ export const getCurrentDateInUTC = (): string => {
  */
 export const convertToUTC = (date: string | Date): string => {
   return dayjs(date).utc().format();
+};
+
+export const convertToUTCDate = (date: string | Date): Date => {
+  return dayjs(date).utc().toDate();
 };
 
 /**
@@ -98,4 +105,15 @@ export const formatTime = (date: string | Date): string => {
  */
 export const formatTimeWithDate = (date: string | Date): string => {
   return dayjs(date).format('h:mm A, MMM D, YY');
+};
+
+export const isNow = (date: Date) => {
+  const now = new Date();
+  return (
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear() &&
+    date.getHours() === now.getHours() &&
+    date.getMinutes() === now.getMinutes()
+  );
 };
