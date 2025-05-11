@@ -39,6 +39,8 @@ const HomeScreen = () => {
     handleDebitTransaction,
     creditLoading,
     debitLoading,
+    transactionTime,
+    setTransactionTime,
   } = useHomeScreen();
 
   return (

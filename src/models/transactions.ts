@@ -6,6 +6,7 @@ import {PostgrestError} from '@supabase/supabase-js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import {getStartAndEndOfDayInUTC} from '../utils/dateTimeUtilities';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -62,14 +63,9 @@ export const fetchTransactionsByDate = async (
   error: PostgrestError | null;
 }> => {
   // Convert specificDate to UTC start and end times
-  const startOfDay = dayjs
-    .tz(`${specificDate}T00:00:00`, 'Asia/Kolkata')
-    .utc()
-    .toISOString();
-  const endOfDay = dayjs
-    .tz(`${specificDate}T23:59:59`, 'Asia/Kolkata')
-    .utc()
-    .toISOString();
+  const {start: startOfDay, end: endOfDay} = getStartAndEndOfDayInUTC({
+    date: specificDate,
+  });
 
   console.log('ByDate', specificDate, startOfDay, endOfDay);
   const {data, error} = await supabase
@@ -98,15 +94,10 @@ export const fetchTransactionsByDateRange = async (
   data: EnrichedTransaction[] | null;
   error: PostgrestError | null;
 }> => {
-  // Convert specificDate to UTC start and end times
-  const startDateTime = dayjs
-    .tz(`${startDate}T00:00:00`, 'Asia/Kolkata')
-    .utc()
-    .toISOString();
-  const endDateTime = dayjs
-    .tz(`${endDate}T23:59:59`, 'Asia/Kolkata')
-    .utc()
-    .toISOString();
+  const {start: startDateTime, end: endDateTime} = getStartAndEndOfDayInUTC({
+    startDate: startDate,
+    endDate: endDate,
+  });
 
   const {data, error} = await supabase
     .from('transactions')

@@ -10,6 +10,7 @@ import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
 import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
+import {getCurrentDateInUTC} from '../utils/dateTimeUtilities';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -22,16 +23,22 @@ export const useHomeScreen = () => {
   const [description, setDescription] = useState<string>('');
   const [creditLoading, setCreditLoading] = useState<boolean>(false);
   const [debitLoading, setDebitLoading] = useState<boolean>(false);
+  const [transactionTime, setTransactionTime] = useState<string>(
+    getCurrentDateInUTC(),
+  );
+
   const todaysDate = dayjs().format('YYYY-MM-DD');
   // Fetch categories, accounts, and transactions
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      dispatch(logoutThunk());
+    }
 
-    dispatch(fetchAllCategoriesThunk(user.id));
-    dispatch(fetchAllAccountsThunk(user.id));
+    dispatch(fetchAllCategoriesThunk(user?.id!));
+    dispatch(fetchAllAccountsThunk(user?.id!));
     dispatch(
       fetchAllTransactionsThunk({
-        userId: user.id,
+        userId: user?.id!,
         date: todaysDate,
       }),
     );
@@ -135,5 +142,7 @@ export const useHomeScreen = () => {
     handleDebitTransaction,
     creditLoading,
     debitLoading,
+    transactionTime,
+    setTransactionTime,
   };
 };

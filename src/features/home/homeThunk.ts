@@ -57,12 +57,10 @@ export const fetchAllTransactionsThunk = createAsyncThunk<
 
       // Check for specific date
       if (date) {
-        console.log('specific Date');
         ({data, error} = await fetchTransactionsByDate(userId, date));
       }
       // Check for date range
       else if (startDate && endDate) {
-        console.log('Date Range');
         ({data, error} = await fetchTransactionsByDateRange(
           userId,
           startDate,
@@ -71,12 +69,10 @@ export const fetchAllTransactionsThunk = createAsyncThunk<
       }
       // Fetch all transactions if no date or range is specified
       else {
-        console.log('All Transactions');
         ({data, error} = await fetchAllTransactions(userId));
       }
 
       if (error) {
-        console.log(error);
         return rejectWithValue(error.message);
       }
 
