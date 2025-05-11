@@ -2,7 +2,7 @@ import {Database} from '../../database.types';
 import {supabase} from '../services/supbaseClient';
 import {Account} from './accounts';
 import {Category} from './categories';
-import {PostgrestError} from '@supabase/supabase-js';
+import {PostgrestError, PostgrestSingleResponse} from '@supabase/supabase-js';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -125,4 +125,24 @@ export const addTransaction = async (transaction: NewTransaction) => {
     .single();
 
   return {data, error};
+};
+
+export const fetchTransactionSum = async (
+  userId: string,
+  startDate: string,
+): Promise<
+  PostgrestSingleResponse<
+    {
+      sum: number;
+    }[]
+  >
+> => {
+  console.log('inside sum start');
+  const sum = await supabase
+    .from('transactions')
+    .select('amount.sum()', {count: 'exact'}) // Proper aggregation
+    .eq('user_id', userId)
+    .gte('transaction_time', startDate);
+  console.log('sum', sum);
+  return sum;
 };

@@ -4,6 +4,7 @@ import {
   fetchAllAccountsThunk,
   fetchAllCategoriesThunk,
   fetchAllTransactionsThunk,
+  fetchTransactionSumsThunk,
 } from './homeThunk';
 import {Category} from '../../models/categories';
 import {Account} from '../../models/accounts';
@@ -25,6 +26,11 @@ type homeScreenState = {
     transactionsLoading: boolean;
     transactionsError: string;
   };
+  meta: {
+    weeklySum: number;
+    monthlySum: number;
+    metaLoading: boolean;
+  };
 };
 
 const initialHomeScreenState: homeScreenState = {
@@ -42,6 +48,11 @@ const initialHomeScreenState: homeScreenState = {
     transactions: [],
     transactionsLoading: false,
     transactionsError: '',
+  },
+  meta: {
+    weeklySum: 0,
+    monthlySum: 0,
+    metaLoading: false,
   },
 };
 
@@ -105,6 +116,19 @@ const homeSlice = createSlice({
         state.transaction.transactionsLoading = false;
         state.transaction.transactionsError =
           action.error.message ?? 'Failed to add transaction';
+      })
+      .addCase(fetchTransactionSumsThunk.pending, state => {
+        state.meta.metaLoading = true;
+      })
+      .addCase(fetchTransactionSumsThunk.fulfilled, (state, action) => {
+        state.meta.weeklySum = action.payload.weeklySum;
+        state.meta.monthlySum = action.payload.monthlySum;
+        state.meta.metaLoading = false;
+      })
+      .addCase(fetchTransactionSumsThunk.rejected, (state, action) => {
+        state.meta.metaLoading = false;
+        state.transaction.transactionsError =
+          action.payload ?? 'Failed to fetch transaction sums';
       });
   },
 });

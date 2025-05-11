@@ -7,9 +7,14 @@ import {
   fetchAllTransactions,
   fetchTransactionsByDate,
   fetchTransactionsByDateRange,
+  fetchTransactionSum,
   NewTransaction,
 } from '../../models/transactions';
 import {PostgrestError} from '@supabase/supabase-js';
+import {
+  getStartAndEndOfDayInUTC,
+  getStartDate,
+} from '../../utils/dateTimeUtilities';
 
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
@@ -142,3 +147,50 @@ export const addTransactionThunk = createAsyncThunk<
     return data ?? [];
   },
 );
+
+export const fetchTransactionSumsThunk = createAsyncThunk<
+  {weeklySum: number; monthlySum: number},
+  string,
+  {rejectValue: string}
+>('home/fetchTransactionSums', async (userId, {rejectWithValue}) => {
+  try {
+    const {start: weekStart} = getStartAndEndOfDayInUTC({
+      date: getStartDate('week'),
+    });
+    const {start: monthStart} = getStartAndEndOfDayInUTC({
+      date: getStartDate('month'),
+    });
+
+    const {data: weeklySumData, error: weekError} = await fetchTransactionSum(
+      userId,
+      weekStart,
+    );
+    if (weekError) {
+      throw new Error(weekError.message);
+    }
+
+    const {data: monthlySumData, error: monthError} = await fetchTransactionSum(
+      userId,
+      monthStart,
+    );
+    if (monthError) {
+      throw new Error(monthError.message);
+    }
+
+    // Extract the sum value from the data
+    const weeklySum = weeklySumData[0].sum ?? 0;
+    const monthlySum = monthlySumData[0].sum ?? 0;
+
+    console.log('Weekly', weeklySum);
+    console.log('monthly', monthlySum);
+
+    return {weeklySum, monthlySum};
+  } catch (error) {
+    console.log('sum error', error);
+    return rejectWithValue(
+      error instanceof Error
+        ? error.message
+        : 'Failed to fetch transaction sums',
+    );
+  }
+});

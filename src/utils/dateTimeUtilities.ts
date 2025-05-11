@@ -29,6 +29,10 @@ export const convertToUTCDate = (date: string | Date): Date => {
   return dayjs(date).utc().toDate();
 };
 
+export const getStartDate = (unit: dayjs.OpUnitType): string => {
+  return dayjs().startOf(unit).format('YYYY-MM-DD');
+};
+
 /**
  * Convert a UTC date to the user's local time zone
  * @param date - UTC date string

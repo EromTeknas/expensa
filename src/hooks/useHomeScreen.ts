@@ -5,6 +5,7 @@ import {
   fetchAllAccountsThunk,
   fetchAllTransactionsThunk,
   addTransactionThunk,
+  fetchTransactionSumsThunk,
 } from '../features/home/homeThunk';
 import {TRANSACTION_TYPE, TransactionType} from '../models/transactions';
 import dayjs from 'dayjs';
@@ -15,7 +16,9 @@ import {getCurrentDateInUTCDate} from '../utils/dateTimeUtilities';
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector(state => state.auth.user);
-  const {category, account, transaction} = useAppSelector(state => state.home);
+  const {category, account, transaction, meta} = useAppSelector(
+    state => state.home,
+  );
 
   const [selectedCategory, setSelectedCategory] = useState<string>();
   const [selectedAccount, setSelectedAccount] = useState<string>();
@@ -33,7 +36,7 @@ export const useHomeScreen = () => {
     if (!user?.id) {
       dispatch(logoutThunk());
     }
-
+    dispatch(fetchTransactionSumsThunk(user?.id!));
     dispatch(fetchAllCategoriesThunk(user?.id!));
     dispatch(fetchAllAccountsThunk(user?.id!));
     dispatch(
@@ -146,5 +149,6 @@ export const useHomeScreen = () => {
     debitLoading,
     transactionTime,
     setTransactionTime,
+    meta,
   };
 };

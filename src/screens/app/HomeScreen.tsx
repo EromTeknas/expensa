@@ -41,6 +41,7 @@ const HomeScreen = () => {
     debitLoading,
     transactionTime,
     setTransactionTime,
+    meta,
   } = useHomeScreen();
 
   return (
@@ -48,12 +49,16 @@ const HomeScreen = () => {
       style={{flex: 1}}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.outerContainer}>
-        <TotalTransactionsStatus
-          transactions={[
-            {label: 'This Month', amount: 10000},
-            {label: 'This Week', amount: 5000},
-          ]}
-        />
+        {!meta.metaLoading ? (
+          <TotalTransactionsStatus
+            transactions={[
+              {label: 'This Month', amount: meta.monthlySum},
+              {label: 'This Week', amount: meta.weeklySum},
+            ]}
+          />
+        ) : (
+          <></>
+        )}
         <View style={styles.addTransactionSection}>
           <View style={styles.addTransactionSectionHeader}>
             <Text style={styles.sectionHeader}>Add Transaction</Text>
