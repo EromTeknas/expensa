@@ -4,16 +4,15 @@ import DatePicker from 'react-native-date-picker';
 import COLORS from '../../constants/colors';
 import {FONTFAMILIES} from '../../constants/fonts';
 import HapticFeedback from 'react-native-haptic-feedback';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import {formatTimeWithDate} from '../../utils/dateTimeUtilities';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 type DateTimePickerComponentProps = {
   onDateChange: (date: Date) => void;
-};
-
-const formatDateTime = (date: Date) => {
-  return date.toLocaleString('en-IN', {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  });
 };
 
 const DateTimePickerComponent = ({
@@ -34,8 +33,9 @@ const DateTimePickerComponent = ({
   };
 
   const handleDateChange = (date: Date) => {
-    setSelectedDate(date);
-    onDateChange(date); // Callback when date changes
+    const utcDate = dayjs(date).utc().toDate(); // Convert selected date to UTC
+    setSelectedDate(utcDate);
+    onDateChange(utcDate); // Callback when date changes
   };
 
   const isNow = () => {
@@ -53,7 +53,7 @@ const DateTimePickerComponent = ({
     <View>
       <View style={styles.outerContainer}>
         <Text style={styles.timeTextStyle}>
-          {isNow() ? 'Now' : formatDateTime(selectedDate)} |{' '}
+          {isNow() ? 'Now' : formatTimeWithDate(selectedDate)} |{' '}
         </Text>
         <TouchableOpacity
           onPress={() => setShowPicker(true)}
