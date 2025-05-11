@@ -129,6 +129,7 @@ export const addTransaction = async (transaction: NewTransaction) => {
 
 export const fetchTransactionSum = async (
   userId: string,
+  type: TransactionType,
   startDate: string,
 ): Promise<
   PostgrestSingleResponse<
@@ -137,12 +138,11 @@ export const fetchTransactionSum = async (
     }[]
   >
 > => {
-  console.log('inside sum start');
   const sum = await supabase
     .from('transactions')
     .select('amount.sum()', {count: 'exact'}) // Proper aggregation
     .eq('user_id', userId)
+    .eq('transaction_type', type)
     .gte('transaction_time', startDate);
-  console.log('sum', sum);
   return sum;
 };

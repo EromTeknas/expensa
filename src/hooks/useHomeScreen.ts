@@ -12,6 +12,13 @@ import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
 import {getCurrentDateInUTCDate} from '../utils/dateTimeUtilities';
+import {
+  getCachedTransactionSums,
+  getLastFetchDate,
+  saveLastFetchDate,
+  saveTransactionSums,
+  updateTransactionSums,
+} from '../utils/localStorageUtilities';
 
 export const useHomeScreen = () => {
   const dispatch = useAppDispatch();
@@ -29,13 +36,44 @@ export const useHomeScreen = () => {
   const [transactionTime, setTransactionTime] = useState<Date>(
     getCurrentDateInUTCDate(),
   );
+  const [sums, setSums] = useState({
+    weeklySum: meta.weeklySum,
+    monthlySum: meta.monthlySum,
+  });
 
   const todaysDate = dayjs().format('YYYY-MM-DD');
+
+  // Fetch transaction sums (optimized)
+  const fetchSums = async () => {
+    try {
+      const lastFetchDate = await getLastFetchDate();
+      const today = dayjs().format('YYYY-MM-DD');
+
+      if (lastFetchDate === today) {
+        // Fetch from local storage
+        const cachedSums = await getCachedTransactionSums();
+        setSums(cachedSums);
+      } else if (user?.id) {
+        // Fetch from the database
+        const result = await dispatch(
+          fetchTransactionSumsThunk(user.id),
+        ).unwrap();
+        setSums(result);
+
+        // Save to local storage
+        await saveTransactionSums(result);
+        await saveLastFetchDate(today);
+      }
+    } catch (error) {
+      console.error('Error fetching transaction sums:', error);
+    }
+  };
   // Fetch categories, accounts, and transactions
   useEffect(() => {
     if (!user?.id) {
       dispatch(logoutThunk());
     }
+    fetchSums();
     dispatch(fetchTransactionSumsThunk(user?.id!));
     dispatch(fetchAllCategoriesThunk(user?.id!));
     dispatch(fetchAllAccountsThunk(user?.id!));
@@ -45,6 +83,7 @@ export const useHomeScreen = () => {
         date: todaysDate,
       }),
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch, user, todaysDate]);
 
   // Auto select first category
@@ -115,6 +154,10 @@ export const useHomeScreen = () => {
 
       setAmount('');
       setDescription('');
+      // Inside handleAddTransaction after adding the transaction successfully
+      await updateTransactionSums(transactionAmount, transactionType, sums);
+      // Re-fetch sums after a successful transaction
+      await fetchSums();
     } catch (error) {
       showToast({
         message: 'Failed to add transaction',
@@ -149,6 +192,6 @@ export const useHomeScreen = () => {
     debitLoading,
     transactionTime,
     setTransactionTime,
-    meta,
+    sums,
   };
 };

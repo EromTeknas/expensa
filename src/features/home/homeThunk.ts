@@ -15,6 +15,10 @@ import {
   getStartAndEndOfDayInUTC,
   getStartDate,
 } from '../../utils/dateTimeUtilities';
+import {
+  saveLastFetchDate,
+  saveTransactionSums,
+} from '../../utils/localStorageUtilities';
 
 export const fetchAllCategoriesThunk = createAsyncThunk<
   Category[],
@@ -155,7 +159,7 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
 >('home/fetchTransactionSums', async (userId, {rejectWithValue}) => {
   try {
     const {start: weekStart} = getStartAndEndOfDayInUTC({
-      date: getStartDate('week'),
+      date: getTodayDate,
     });
     const {start: monthStart} = getStartAndEndOfDayInUTC({
       date: getStartDate('month'),
@@ -181,8 +185,9 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
     const weeklySum = weeklySumData[0].sum ?? 0;
     const monthlySum = monthlySumData[0].sum ?? 0;
 
-    console.log('Weekly', weeklySum);
-    console.log('monthly', monthlySum);
+    // Save sums and current date in local storage
+    await saveTransactionSums({weeklySum, monthlySum});
+    await saveLastFetchDate(new Date().toISOString());
 
     return {weeklySum, monthlySum};
   } catch (error) {
