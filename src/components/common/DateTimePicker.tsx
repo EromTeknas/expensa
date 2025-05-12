@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import DatePicker from 'react-native-date-picker';
 import COLORS from '../../constants/colors';
@@ -7,70 +7,90 @@ import HapticFeedback from 'react-native-haptic-feedback';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import {formatTimeWithDate, isNow} from '../../utils/dateTimeUtilities';
+import {
+  formatTimeWithDate,
+  getCurrentDateInUTCDate,
+  isNow,
+} from '../../utils/dateTimeUtilities';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-//TODO
-// If we set time to 'NOW' on 11.50 PM
-// If 5 min past, the label is shown Now, but the time stored in state is still 11.50
-// We need to implement the provision, if the NOW is displayed, then the time picked should be current
 type DateTimePickerComponentProps = {
-  selectedDate: Date;
-  onDateChange: (date: Date) => void;
+  // getSelectedDate: () => Date;
 };
 
-const DateTimePickerComponent = ({
-  selectedDate,
-  onDateChange,
-}: DateTimePickerComponentProps) => {
-  const [showPicker, setShowPicker] = useState(false);
+const DateTimePickerComponent = forwardRef<DateTimePickerComponentProps>(
+  (
+    _,
+    // {selectedDate, onDateChange}: DateTimePickerComponentProps,
+    ref,
+  ) => {
+    const [showPicker, setShowPicker] = useState(false);
+    const [isNowSelected, setIsNowSelected] = useState(true);
+    const [selectedDate, setSelectedDate] = useState(getCurrentDateInUTCDate());
 
-  const setToNow = () => {
-    const now = new Date();
-    onDateChange(now); // Callback with current date
-  };
+    const setToNow = () => {
+      const now = new Date();
+      handleDateChange(now);
+    };
 
-  const handleLongPress = () => {
-    HapticFeedback.trigger('impactHeavy'); // Trigger vibration
-    setToNow();
-  };
+    const handleLongPress = () => {
+      HapticFeedback.trigger('impactHeavy'); // Trigger vibration
+      setToNow();
+    };
 
-  const handleDateChange = (date: Date) => {
-    const utcDate = dayjs(date).utc().toDate(); // Convert selected date to UTC
-    onDateChange(utcDate); // Callback when date changes
-  };
+    const handleDateChange = (date: Date) => {
+      const utcDate = dayjs(date).utc().toDate(); // Convert selected date to UTC
+      if (isNow(utcDate)) {
+        console.log('It is Now Date');
+        setIsNowSelected(true);
+      } else {
+        console.log('Not a Now Date');
+        setIsNowSelected(false);
+      }
+      console.log('Handle Date Change', utcDate.toISOString());
+      setSelectedDate(utcDate); // Callback when date changes
+    };
+    // Expose the method to get the actual date when submitting
+    useImperativeHandle(ref, () => ({
+      getSelectedDate: () => {
+        const date = isNowSelected ? new Date() : selectedDate;
 
-  return (
-    <View>
-      <View style={styles.outerContainer}>
-        <Text style={styles.timeTextStyle}>
-          {isNow(selectedDate) ? 'Now' : formatTimeWithDate(selectedDate)} |{' '}
-        </Text>
-        <TouchableOpacity
-          onPress={() => setShowPicker(true)}
-          onLongPress={handleLongPress}
-          delayLongPress={300}>
-          <Text style={styles.changeTimeButtonStyle}>Change Time</Text>
-        </TouchableOpacity>
+        console.log('date returned', date);
+        return date;
+      },
+    }));
+    return (
+      <View>
+        <View style={styles.outerContainer}>
+          <Text style={styles.timeTextStyle}>
+            {isNowSelected ? 'Now' : formatTimeWithDate(selectedDate)} |
+          </Text>
+          <TouchableOpacity
+            onPress={() => setShowPicker(true)}
+            onLongPress={handleLongPress}
+            delayLongPress={300}>
+            <Text style={styles.changeTimeButtonStyle}>Change Time</Text>
+          </TouchableOpacity>
 
-        <DatePicker
-          modal
-          open={showPicker}
-          date={selectedDate}
-          mode="datetime"
-          maximumDate={new Date()}
-          theme={'dark'}
-          onConfirm={date => {
-            handleDateChange(date);
-            setShowPicker(false);
-          }}
-          onCancel={() => setShowPicker(false)}
-        />
+          <DatePicker
+            modal
+            open={showPicker}
+            date={selectedDate}
+            mode="datetime"
+            maximumDate={new Date()}
+            theme={'dark'}
+            onConfirm={date => {
+              handleDateChange(date);
+              setShowPicker(false);
+            }}
+            onCancel={() => setShowPicker(false)}
+          />
+        </View>
       </View>
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   outerContainer: {

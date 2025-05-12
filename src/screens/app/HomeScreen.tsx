@@ -39,11 +39,10 @@ const HomeScreen = () => {
     handleDebitTransaction,
     creditLoading,
     debitLoading,
-    transactionTime,
-    setTransactionTime,
     meta,
     handleDeleteTransaction,
     transactions,
+    datePickerRef,
   } = useHomeScreen();
 
   return (
@@ -64,10 +63,7 @@ const HomeScreen = () => {
         <View style={styles.addTransactionSection}>
           <View style={styles.addTransactionSectionHeader}>
             <Text style={styles.sectionHeader}>Add Transaction</Text>
-            <DateTimePickerComponent
-              selectedDate={transactionTime}
-              onDateChange={date => setTransactionTime(date)}
-            />
+            <DateTimePickerComponent ref={datePickerRef} />
           </View>
           <View style={styles.addTransactionInnerSection}>
             <View style={styles.row}>

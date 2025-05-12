@@ -16,7 +16,6 @@ import {
 import dayjs from 'dayjs';
 import showToast from '../utils/toast';
 import {logoutThunk} from '../features/auth/authThunk';
-import {getCurrentDateInUTCDate} from '../utils/dateTimeUtilities';
 import Toast from 'react-native-toast-message';
 
 export const useHomeScreen = () => {
@@ -32,9 +31,7 @@ export const useHomeScreen = () => {
   const [description, setDescription] = useState<string>('');
   const [creditLoading, setCreditLoading] = useState<boolean>(false);
   const [debitLoading, setDebitLoading] = useState<boolean>(false);
-  const [transactionTime, setTransactionTime] = useState<Date>(
-    getCurrentDateInUTCDate(),
-  );
+
   const [transactions, setTransactions] = useState<EnrichedTransaction[]>(
     transaction.transactions,
   );
@@ -42,6 +39,12 @@ export const useHomeScreen = () => {
   const softDeletedTransactionRef = useRef<number | null>(null);
 
   const todaysDate = dayjs().format('YYYY-MM-DD');
+  const datePickerRef = useRef<{getSelectedDate: () => Date}>(null);
+  const getSelectedDate = () => {
+    const date = datePickerRef.current?.getSelectedDate();
+    console.log('Selected Date for Submission:', date);
+    return date;
+  };
   // Fetch categories, accounts, and transactions
   useEffect(() => {
     if (!user?.id) {
@@ -96,17 +99,10 @@ export const useHomeScreen = () => {
       showToast({
         message: 'Please enter a valid amount',
         type: 'error',
-        trailingButton: {
-          label: 'abc',
-          onPress: () => {
-            console.log('abc');
-          },
-        },
       });
       return;
     }
 
-    console.log('Transaction Time ', transactionTime.toISOString());
     // Start loading
     setLoading(true);
 
@@ -120,7 +116,7 @@ export const useHomeScreen = () => {
             account_id: selectedAccount,
             description,
             type: transactionType,
-            transaction_time: transactionTime.toISOString(),
+            transaction_time: getSelectedDate()?.toISOString(),
           },
           fetchOptions: {
             date: todaysDate,
@@ -140,6 +136,7 @@ export const useHomeScreen = () => {
         message: 'Failed to add transaction',
         type: 'error',
       });
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -222,10 +219,9 @@ export const useHomeScreen = () => {
     handleDebitTransaction,
     creditLoading,
     debitLoading,
-    transactionTime,
-    setTransactionTime,
     meta,
     handleDeleteTransaction,
     transactions,
+    datePickerRef,
   };
 };
