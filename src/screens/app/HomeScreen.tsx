@@ -21,8 +21,12 @@ import {
 } from '../../components/common/Icons';
 import DateTimePickerComponent from '../../components/common/DateTimePicker';
 import {FONTFAMILIES} from '../../constants/fonts';
+import {ScreenProps} from '../../@types/navigation';
+import ROUTES from 'src/constants/routes';
 
-const HomeScreen = () => {
+const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
+  navigation,
+}) => {
   const {
     category,
     account,

@@ -1,9 +1,10 @@
 import React from 'react';
 import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // You can use other icon sets
-import {useNavigation} from '@react-navigation/native';
 import {logoutThunk} from '../../features/auth/authThunk';
 import {useAppDispatch} from '../../app/hooks';
+import {ScreenProps} from '../../@types/navigation';
+import ROUTES from '../../constants/routes';
 
 const menuItems = [
   {
@@ -20,8 +21,9 @@ const menuItems = [
   },
 ];
 
-const SettingsScreen = () => {
-  const navigation = useNavigation();
+const SettingsScreen: React.FC<ScreenProps<typeof ROUTES.SETTINGS>> = ({
+  navigation,
+}) => {
   const dispatch = useAppDispatch();
 
   const handleNavigate = (screen: string) => {

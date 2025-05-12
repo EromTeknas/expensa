@@ -1,4 +1,3 @@
-import {NavigationContainer} from '@react-navigation/native';
 import React, {useEffect} from 'react';
 import {Provider} from 'react-redux';
 import LoginScreen from './src/screens/LoginScreen';
@@ -10,7 +9,13 @@ import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
 import COLORS from './src/constants/colors';
 import Toast from 'react-native-toast-message';
 import toastConfig from './src/configs/toastConfig';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import ROUTES from './src/constants/routes';
+import BottomTabs from './src/navigation/BottomTabs';
+import {RootStackParamList} from './src/@types/navigation';
 
+const Stack = createNativeStackNavigator<RootStackParamList>();
 function App(): React.JSX.Element {
   useEffect(() => {
     const fetchSession = async () => {
@@ -31,8 +36,10 @@ function App(): React.JSX.Element {
             backgroundColor={COLORS.backgroundColor}
           />
           <NavigationContainer>
-            {/* Replace this with navigation later */}
-            <LoginScreen />
+            <Stack.Navigator screenOptions={{headerShown: false}}>
+              <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
+              <Stack.Screen name={ROUTES.TABS} component={BottomTabs} />
+            </Stack.Navigator>
             <Toast config={toastConfig} />
           </NavigationContainer>
         </SafeAreaView>

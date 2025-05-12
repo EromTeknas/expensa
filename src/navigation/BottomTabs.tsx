@@ -4,9 +4,10 @@ import HomeScreen from '../screens/app/HomeScreen';
 import SettingsScreen from '../screens/app/SettingsScreen';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import COLORS from '../constants/colors';
+import ROUTES, {RouteName} from '../constants/routes';
 // import {NavigationContainer} from '@react-navigation/native';
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<Record<RouteName, undefined>>();
 
 const BottomTabs = () => {
   return (
@@ -15,11 +16,11 @@ const BottomTabs = () => {
         tabBarIcon: ({focused, color, size}) => {
           let iconName;
 
-          if (route.name === 'Home') {
+          if (route.name === ROUTES.HOME) {
             iconName = focused
               ? 'ios-information-circle'
               : 'ios-information-circle-outline';
-          } else if (route.name === 'Settings') {
+          } else if (route.name === ROUTES.SETTINGS) {
             iconName = focused ? 'ios-list' : 'ios-list-outline';
           }
 
@@ -37,11 +38,11 @@ const BottomTabs = () => {
         headerShown: false,
       })}>
       <Tab.Screen
-        name="Home"
+        name={ROUTES.HOME}
         component={HomeScreen}
         options={{headerShown: false}}
       />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name={ROUTES.SETTINGS} component={SettingsScreen} />
     </Tab.Navigator>
   );
 };
