@@ -13,6 +13,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import ROUTES from './src/constants/routes';
 import BottomTabs from './src/navigation/BottomTabs';
+import SyncTransactionsScreen from './src/screens/app/SyncTransactionsScreen';
 import {RootStackParamList} from './src/@types/navigation';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -39,6 +40,10 @@ function App(): React.JSX.Element {
             <Stack.Navigator screenOptions={{headerShown: false}}>
               <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
               <Stack.Screen name={ROUTES.TABS} component={BottomTabs} />
+              <Stack.Screen
+                name={ROUTES.SYNC_TRANSACTIONS}
+                component={SyncTransactionsScreen}
+              />
             </Stack.Navigator>
             <Toast config={toastConfig} />
           </NavigationContainer>

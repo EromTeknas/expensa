@@ -3,7 +3,7 @@ const ROUTES = {
   LOGIN: 'LOGIN',
   HOME: 'HOME',
   SETTINGS: 'SETTINGS',
-  SYNC: 'SYNC',
+  SYNC_TRANSACTIONS: 'SYNC_TRANSACTIONS',
   TABS: 'TABS',
 } as const;
 

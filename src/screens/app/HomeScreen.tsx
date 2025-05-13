@@ -5,6 +5,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import GroupedExpensesList from '../../components/TransactionList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
@@ -18,12 +19,13 @@ import {
   CardTextIcon,
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
+  GearIcon,
 } from '../../components/common/Icons';
 import DateTimePickerComponent from '../../components/common/DateTimePicker';
 import {FONTFAMILIES} from '../../constants/fonts';
+import LinearGradient from 'react-native-linear-gradient';
+import ROUTES from '../../constants/routes';
 import {ScreenProps} from '../../@types/navigation';
-import ROUTES from 'src/constants/routes';
-
 const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
   navigation,
 }) => {
@@ -54,16 +56,30 @@ const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
       style={{flex: 1}}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={styles.outerContainer}>
-        {!meta.metaLoading ? (
-          <TotalTransactionsStatus
-            transactions={[
-              {label: 'This Month', amount: meta.monthlySum},
-              {label: 'This Week', amount: meta.weeklySum},
-            ]}
-          />
-        ) : (
-          <></>
-        )}
+        <View style={styles.row}>
+          {!meta.metaLoading ? (
+            <TotalTransactionsStatus
+              transactions={[
+                {label: 'This Month', amount: meta.monthlySum},
+                {label: 'This Week', amount: meta.weeklySum},
+              ]}
+            />
+          ) : (
+            <></>
+          )}
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate(ROUTES.SYNC);
+            }}>
+            <LinearGradient
+              colors={['#1D1D1D', '#262626']}
+              start={{x: 0, y: 0.5}}
+              end={{x: 1, y: 0.5}}
+              style={styles.iconButton}>
+              <GearIcon height={16} width={16} color={COLORS.grey[100]} />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
         <View style={styles.addTransactionSection}>
           <View style={styles.addTransactionSectionHeader}>
             <Text style={styles.sectionHeader}>Add Transaction</Text>
@@ -258,5 +274,13 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     gap: 8,
+  },
+  iconButton: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 8,
   },
 });

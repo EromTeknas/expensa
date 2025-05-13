@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     gap: 16,
     borderRadius: 16,
+    flex: 1,
     overflow: 'hidden',
     ...Platform.select({
       ios: {
