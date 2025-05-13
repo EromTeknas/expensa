@@ -69,7 +69,7 @@ const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
           )}
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate(ROUTES.SYNC);
+              navigation.navigate(ROUTES.SYNC_TRANSACTIONS);
             }}>
             <LinearGradient
               colors={['#1D1D1D', '#262626']}

@@ -15,7 +15,6 @@ import ROUTES from './src/constants/routes';
 import BottomTabs from './src/navigation/BottomTabs';
 import SyncTransactionsScreen from './src/screens/app/SyncTransactionsScreen';
 import {RootStackParamList} from './src/@types/navigation';
-
 const Stack = createNativeStackNavigator<RootStackParamList>();
 function App(): React.JSX.Element {
   useEffect(() => {
@@ -43,6 +42,11 @@ function App(): React.JSX.Element {
               <Stack.Screen
                 name={ROUTES.SYNC_TRANSACTIONS}
                 component={SyncTransactionsScreen}
+                options={({navigation}) => ({
+                  presentation: 'modal',
+                  animationTypeForReplace: 'push',
+                  animation: 'slide_from_right',
+                })}
               />
             </Stack.Navigator>
             <Toast config={toastConfig} />
