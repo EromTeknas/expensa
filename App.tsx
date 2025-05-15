@@ -12,9 +12,17 @@ import COLORS from './src/constants/colors';
 function App(): React.JSX.Element {
   useEffect(() => {
     const fetchSession = async () => {
-      const {data} = await supabase.auth.getSession();
-      if (data.session?.user) {
-        store.dispatch(setUser(data.session.user));
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error('Error fetching session:', error.message);
+          return;
+        }
+        if (data.session?.user) {
+          store.dispatch(setUser(data.session.user));
+        }
+      } catch (err) {
+        console.error('Unexpected error fetching session:', err);
       }
     };
 
