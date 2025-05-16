@@ -8,6 +8,7 @@ import {transactionsSchema} from './schemas/transactions.schema';
 import {hashesSchema} from './schemas/hashes.schema';
 import {settingsSchema} from './schemas/settings.schema';
 import {migrations} from './migration';
+
 const adapter = new SQLiteAdapter({
   schema: appSchema({
     version: 2,
