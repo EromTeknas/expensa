@@ -15,7 +15,7 @@ import com.facebook.soloader.SoLoader
 import android.content.Context
 import com.facebook.react.ReactInstanceManager
 import java.lang.reflect.InvocationTargetException
-
+import com.react.SmsPackage 
 class MainApplication : Application(), ReactApplication {
 
   override val reactNativeHost: ReactNativeHost =
@@ -25,6 +25,7 @@ class MainApplication : Application(), ReactApplication {
                       // Packages that cannot be autolinked yet can be added manually here, for
                       // example:
                       // add(MyReactNativePackage())
+                      add(SmsPackage())
                     }
 
             override fun getJSMainModuleName(): String = "index"
