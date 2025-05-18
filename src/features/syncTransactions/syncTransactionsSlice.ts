@@ -6,6 +6,8 @@ import {
 } from './syncTransactionsThunk';
 import {EnrichedTransaction} from 'src/models/transactions';
 
+// TODO
+// Change Naming Convention for function and state
 type SyncTransactionsScreenState = {
   isSyncing: boolean;
   hasNewTransactions: boolean;
@@ -58,11 +60,23 @@ const syncTransactionsSlice = createSlice({
           h => h !== hash,
         );
     },
+
+    hasNewTransactions: state => {
+      if (
+        state.isSyncing &&
+        state.syncTransactions.unsyncedTransactions.length === 0
+      ) {
+        state.hasNewTransactions = false;
+      } else {
+        state.hasNewTransactions = true;
+      }
+    },
   },
   extraReducers: builder => {
     builder
       .addCase(addSyncTransactionsThunk.pending, state => {
         state.syncTransactions.loading = true;
+        state.isSyncing = true;
       })
       .addCase(addSyncTransactionsThunk.fulfilled, (state, action) => {
         state.syncTransactions.unsyncedTransactions =
@@ -70,11 +84,13 @@ const syncTransactionsSlice = createSlice({
         state.syncTransactions.skippedTransactions =
           action.payload.transactionsSkipped;
         state.syncTransactions.loading = false;
+        state.isSyncing = false;
       })
       .addCase(addSyncTransactionsThunk.rejected, (state, action) => {
         state.syncTransactions.error =
           action.error.message ?? 'Failed to Sync Transactions';
         state.syncTransactions.loading = false;
+        state.isSyncing = false;
       })
       .addCase(syncTransactionsToSupabaseThunk.pending, state => {
         state.syncTransactionsButtonState.loading = true;
