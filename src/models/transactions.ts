@@ -146,7 +146,7 @@ export const fetchTransactionSum = async (
 };
 
 // Add a new transaction
-export const deleteTransaction = async (transactionId: number) => {
+export const deleteTransaction = async (transactionId: string) => {
   const {error} = await supabase
     .from('transactions')
     .delete()

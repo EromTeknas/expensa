@@ -29,8 +29,7 @@ export const fetchAllCategoriesThunk = createAsyncThunk<
   }
 
   return data ?? [];
-}
-);
+});
 
 export const fetchAllAccountsThunk = createAsyncThunk<
   Account[],
@@ -190,8 +189,8 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
 });
 
 export const deleteTransactionThunk = createAsyncThunk<
-  number, // Return type (transaction ID on success)
-  number, // Argument type (transaction ID)
+  string, // Return type (transaction ID on success)
+  string, // Argument type (transaction ID)
   {rejectValue: string} // Rejection type (error message)
 >('home/deleteTransaction', async (transactionId, {rejectWithValue}) => {
   try {

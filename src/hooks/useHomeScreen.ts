@@ -36,7 +36,7 @@ export const useHomeScreen = () => {
     transaction.transactions,
   );
 
-  const softDeletedTransactionRef = useRef<number | null>(null);
+  const softDeletedTransactionRef = useRef<string | null>(null);
 
   const todaysDate = dayjs().format('YYYY-MM-DD');
   const datePickerRef = useRef<{getSelectedDate: () => Date}>(null);
@@ -147,7 +147,7 @@ export const useHomeScreen = () => {
   const handleDebitTransaction = () =>
     handleAddTransaction(TRANSACTION_TYPE.DEBIT, setDebitLoading);
 
-  const handleDeleteTransaction = async (transactionId: number) => {
+  const handleDeleteTransaction = async (transactionId: string) => {
     let deletedTransactionIndex = transactions.findIndex(
       (tr, _) => tr.id === transactionId,
     );
