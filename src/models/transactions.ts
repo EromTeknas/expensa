@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import {getStartAndEndOfDayInUTC} from '../utils/dateTimeUtilities';
+import {WMNewTransactionInput} from '../watermelon/services/transactionService';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -153,4 +154,109 @@ export const deleteTransaction = async (transactionId: number) => {
 
   console.log(error);
   return {error};
+};
+
+export async function addMultipleTransactions(
+  transactions: NewTransaction[],
+): Promise<{data: NewTransaction[]; error: PostgrestError | null}> {
+  try {
+    const {data, error} = await supabase
+      .from('transactions')
+      .insert(transactions);
+
+    if (error) {
+      console.error('Error inserting transactions:', error);
+      return {data: [], error};
+    }
+    const trans = data ?? [];
+    return {data: trans, error: null};
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return {data: [], error: err as PostgrestError};
+  }
+}
+
+export const fetchEnrichedTransactionsByIds = async (
+  transactionIds: string[],
+): Promise<{
+  data: EnrichedTransaction[];
+  error: PostgrestError | null;
+}> => {
+  if (transactionIds.length === 0) {
+    return {data: [], error: null};
+  }
+  try {
+    const {data, error} = await supabase
+      .from('transactions')
+      .select(
+        `
+      *,
+      account:account_id ( id, name ),
+      category:category_id ( id, name )
+    `,
+      )
+      .in('id', transactionIds)
+      .order('transaction_time', {ascending: false});
+
+    if (error) {
+      console.error('Error Fetching transactions:', error);
+      return {data: [], error};
+    }
+
+    const trans: EnrichedTransaction[] = data ?? [];
+    return {data: trans, error};
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return {data: [], error: err as PostgrestError};
+  }
+};
+
+export const checkIfHashesExist = async (
+  hashes: string[],
+): Promise<{
+  existingHashes: string[];
+  error: string | null;
+}> => {
+  try {
+    const {data, error} = await supabase
+      .from('hashes')
+      .select('hash')
+      .in('hash', hashes);
+
+    if (error) {
+      console.error('Failed to fetch existing hashes:', error.message);
+      return {existingHashes: [], error: error.message};
+    }
+
+    const existingHashes = data?.map(item => item.hash) ?? [];
+
+    return {existingHashes, error: null};
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    return {existingHashes: [], error: (err as Error).message};
+  }
+};
+
+export const mapWMTransactionToNewTransaction = (
+  wmTran: WMNewTransactionInput,
+  user_id: string,
+): NewTransaction => {
+  return {
+    account_id: wmTran.account_id ?? '',
+    amount: wmTran.amount ?? 0,
+    category_id: wmTran.category_id ?? '',
+    description: wmTran.description ?? null,
+    hash: wmTran.hash ?? null,
+    transaction_time: new Date(wmTran.transactionTime).toISOString(),
+    type: wmTran.type ?? 'DEBIT',
+    user_id,
+  };
+};
+export const mapWMTransactionsToNewTransactions = (
+  wmTransactions: WMNewTransactionInput[],
+  user_id: string,
+): NewTransaction[] => {
+  return wmTransactions.map(tran =>
+    mapWMTransactionToNewTransaction(tran, user_id),
+  );
 };

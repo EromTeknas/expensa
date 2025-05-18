@@ -1,34 +1,31 @@
 import SmsAndroid from 'react-native-get-sms-android';
-import REGEXS from '../constants/smsRegex';
 import parseTransaction from '../utils/parser';
-import {
-  createWMTransaction,
-  WMNewTransactionInput,
-} from '../watermelon/services/transactionService';
+import {WMNewTransactionInput} from '../watermelon/services/transactionService';
 import getHash from '../utils/hash';
 
-export const getMessageSinceLastSyncDate = (lastSyncDate: Date) => {
-  console.log('Inside the getMessagesSinceLastSyncDate');
+
+// TODO
+// Handle the SMS Retreiver Failure
+export const getMessageSinceLastSyncDate = (
+  lastSyncDate: Date,
+): WMNewTransactionInput[] => {
   const filtersString = getFiltersJson(lastSyncDate);
-  console.log('regex', REGEXS.ICICIBANK);
+  const listOfWpTransactions: WMNewTransactionInput[] = [];
+
   SmsAndroid.list(
     filtersString,
     fail => {
       console.log('Failed to Retreive Messages', fail);
     },
-    (count, smsListString) => {
+    (_, smsListString) => {
       const smsList = JSON.parse(smsListString);
 
       smsList.forEach(async (sms: any) => {
-        // console.log(sms.body);
-        console.log(sms);
         const tran = parseTransaction(sms.body);
-        console.log(sms.date);
-        console.log(tran);
         if (tran) {
           const hash = await getHash(`${sms.body}${sms.date}`);
           if (hash) {
-            const NewTransaction: WMNewTransactionInput = {
+            const newTransaction: WMNewTransactionInput = {
               hash: hash,
               isSynced: false,
               bankName: tran.bankName,
@@ -37,24 +34,19 @@ export const getMessageSinceLastSyncDate = (lastSyncDate: Date) => {
               transactionTime: sms.date as number,
               party: tran.party,
               description: tran.party,
+              category_id: null,
+              account_id: null,
             };
 
-            createWMTransaction(NewTransaction)
-              .then(newTran => {
-                console.log('Transaction added to local db', newTran);
-              })
-              .catch(err => {
-                console.error('Failed to add transaction to wm db', err);
-              });
+            listOfWpTransactions.push(newTransaction);
           } else {
             console.warn('Skipping Transaction Due to hash not generated');
           }
-        } else {
-          console.error('Unable to fetch Transaction');
         }
       });
     },
   );
+  return listOfWpTransactions;
 };
 
 const getFiltersJson = (lastSyncDate: Date) => {

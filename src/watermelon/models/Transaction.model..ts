@@ -14,6 +14,8 @@ export default class Transaction extends Model {
   @field('party') party!: string;
   @field('created_at') createdAt!: number;
   @field('updated_at') updatedAt!: number;
+  @field('category_id') categoryId!: string;
+  @field('account_id') accountId!: string;
 
   // @field('user_id') userId!: string;
 

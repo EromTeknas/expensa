@@ -29,7 +29,8 @@ export const fetchAllCategoriesThunk = createAsyncThunk<
   }
 
   return data ?? [];
-});
+}
+);
 
 export const fetchAllAccountsThunk = createAsyncThunk<
   Account[],

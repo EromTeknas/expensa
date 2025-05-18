@@ -30,6 +30,8 @@ export const migrations = schemaMigrations({
             {name: 'amount', type: 'number', isOptional: true},
             {name: 'description', type: 'string', isOptional: true},
             {name: 'party', type: 'string', isOptional: true},
+            {name: 'category_id', type: 'string', isOptional: true},
+            {name: 'account_id', type: 'string', isOptional: true},
           ],
         }),
       ],
