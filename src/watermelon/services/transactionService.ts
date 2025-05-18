@@ -3,7 +3,6 @@ import {database} from '../database';
 import Transaction from '../models/Transaction.model.';
 
 export type WMNewTransactionInput = {
-  id?: string; // optional custom id
   hash: string;
   isSynced: boolean;
   bankName: string | null;
@@ -28,9 +27,6 @@ export async function createWMTransaction(
     await database.write(async () => {
       const collection = database.collections.get<Transaction>('transactions');
       transaction = await collection.create(t => {
-        if (data.id) {
-          t._raw.id = ; // optional custom id
-        }
         t.hash = data.hash;
         t.isSynced = data.isSynced;
         t.bankName = data.bankName ?? '';

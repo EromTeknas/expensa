@@ -5,7 +5,6 @@ import {
   createWMTransaction,
   WMNewTransactionInput,
 } from '../watermelon/services/transactionService';
-import {randomId} from '@nozbe/watermelondb/utils/common';
 import getHash from '../utils/hash';
 
 export const getMessageSinceLastSyncDate = (lastSyncDate: Date) => {
@@ -30,7 +29,6 @@ export const getMessageSinceLastSyncDate = (lastSyncDate: Date) => {
           const hash = await getHash(`${sms.body}${sms.date}`);
           if (hash) {
             const NewTransaction: WMNewTransactionInput = {
-              id: randomId(),
               hash: hash,
               isSynced: false,
               bankName: tran.bankName,
