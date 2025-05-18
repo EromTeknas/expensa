@@ -15,9 +15,7 @@ import ROUTES from './src/constants/routes';
 import BottomTabs from './src/navigation/BottomTabs';
 import SyncTransactionsScreen from './src/screens/app/SyncTransactionsScreen';
 import {RootStackParamList} from './src/@types/navigation';
-import {initializeDatabase} from './src/watermelon/utils/init.db';
-import {database} from './src/watermelon/database';
-import {Q} from '@nozbe/watermelondb';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 function App(): React.JSX.Element {
   useEffect(() => {
@@ -29,22 +27,6 @@ function App(): React.JSX.Element {
     };
 
     fetchSession();
-
-    initializeDatabase().then(async () => {
-      // Fetch the last sync date and sync feature status
-      const settings = await database.collections
-        .get('settings')
-        .query(Q.where('is_sync_feature_enabled', Q.notEq(null))) // ensures the setting exists
-        .fetch();
-
-      if (settings.length > 0) {
-        const setting = settings[0];
-        console.log('Setting', setting);
-      } else {
-        // Handle case if settings are missing (though unlikely)
-        console.log('Settings not found.');
-      }
-    });
   }, []);
   return (
     <Provider store={store}>

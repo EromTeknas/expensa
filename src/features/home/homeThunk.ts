@@ -105,8 +105,6 @@ export const addTransactionThunk = createAsyncThunk<
 >(
   'home/addTransaction',
   async ({newTransaction, fetchOptions}, {rejectWithValue}) => {
-    console.log('newtran', newTransaction);
-    console.log('fetch options', fetchOptions);
     // Add the transaction
     const {error: addError} = await addTransaction(newTransaction);
 
@@ -120,7 +118,6 @@ export const addTransactionThunk = createAsyncThunk<
 
     // Check for specific date
     if (fetchOptions?.date) {
-      console.log('specific Date');
       ({data, error} = await fetchTransactionsByDate(
         newTransaction.user_id,
         fetchOptions.date,
@@ -128,7 +125,6 @@ export const addTransactionThunk = createAsyncThunk<
     }
     // Check for date range
     else if (fetchOptions?.startDate && fetchOptions.endDate) {
-      console.log('Date Range');
       ({data, error} = await fetchTransactionsByDateRange(
         newTransaction.user_id,
         fetchOptions.startDate,
@@ -137,7 +133,6 @@ export const addTransactionThunk = createAsyncThunk<
     }
     // Fetch all transactions if no date or range is specified
     else {
-      console.log('All Transactions');
       ({data, error} = await fetchAllTransactions(newTransaction.user_id));
     }
 
@@ -181,9 +176,6 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
     // Extract the sum value from the data
     const weeklySum = weeklySumData[0].sum ?? 0;
     const monthlySum = monthlySumData[0].sum ?? 0;
-
-    console.log('Weekly', weeklySum);
-    console.log('monthly', monthlySum);
 
     return {weeklySum, monthlySum};
   } catch (error) {

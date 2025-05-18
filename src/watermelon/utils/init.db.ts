@@ -13,8 +13,7 @@ export const initializeDatabase = async () => {
         .fetch();
 
       if (existingSettings.length === 0) {
-        // Set the last sync date to the start of the previous week in UTC
-        const lastSyncDate = startOfWeek(subWeeks(new Date(), 1)).toISOString();
+        const lastSyncDate = startOfWeek(subWeeks(new Date(), 1)).getTime();
 
         await database.collections.get('settings').create((record: any) => {
           record.isSyncFeatureEnabled = false; // Default to false

@@ -6,5 +6,5 @@ export default class Settings extends Model {
   static table = 'settings';
 
   @field('is_sync_feature_enabled') isSyncFeatureEnabled!: boolean;
-  @field('last_sync_date') lastSyncDate!: string;
+  @field('last_sync_date') lastSyncDate!: number;
 }

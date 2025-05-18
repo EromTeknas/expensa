@@ -54,11 +54,9 @@ export const getStartAndEndOfDayInUTC = (
   // Determine if the argument is a single date or a date range
   const {startDate, endDate} =
     'date' in args ? {startDate: args.date, endDate: args.date} : args;
-  console.log('local', startDate, endDate);
   // Get start and end of day in the user's local timezone and convert to UTC
   const start = dayjs.tz(`${startDate}T00:00:00`, timeZone).utc().format();
   const end = dayjs.tz(`${endDate}T23:59:59`, timeZone).utc().format();
-  console.log('utc', start, end);
   return {start, end};
 };
 

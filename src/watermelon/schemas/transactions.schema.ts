@@ -1,13 +1,19 @@
-import {tableSchema} from '@nozbe/watermelondb/Schema';
+import {tableSchema} from '@nozbe/watermelondb';
+
 export const transactionsSchema = tableSchema({
   name: 'transactions',
   columns: [
-    {name: 'amount', type: 'number'},
+    {name: 'hash', type: 'string', isIndexed: true}, // required
+    {name: 'is_synced', type: 'boolean'}, // required
+    {name: 'transaction_time', type: 'number'}, // required (ISO string)
+    {name: 'created_at', type: 'number'},
+    {name: 'updated_at', type: 'number'},
+
+    // Optional fields:
+    {name: 'bank_name', type: 'string', isOptional: true},
+    {name: 'type', type: 'string', isOptional: true},
+    {name: 'amount', type: 'number', isOptional: true},
     {name: 'description', type: 'string', isOptional: true},
-    {name: 'transaction_time', type: 'string'}, // UTC format
-    {name: 'type', type: 'string'}, // Transaction type (enum as string)
-    {name: 'user_id', type: 'string'},
-    {name: 'account', type: 'string'}, // JSON string for account object
-    {name: 'category', type: 'string'}, // JSON string for category object
+    {name: 'party', type: 'string', isOptional: true},
   ],
 });

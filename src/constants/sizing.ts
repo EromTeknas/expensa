@@ -5,12 +5,6 @@ import {PixelRatio} from 'react-native';
  */
 const scaleSize = (px: number) => {
   const pixelDensity = PixelRatio.get();
-  console.log(
-    'Pixel to Density',
-    px,
-    px / pixelDensity,
-    PixelRatio.roundToNearestPixel(px / pixelDensity),
-  );
 
   return PixelRatio.roundToNearestPixel(px / pixelDensity);
 };

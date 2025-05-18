@@ -1,61 +1,50 @@
-import {EnrichedTransaction} from '../../models/transactions';
+import {Q} from '@nozbe/watermelondb';
 import {database} from '../database';
+import Transaction from '../models/Transaction.model.';
 
-export const saveTransactionWithHash = async (
-  hash: string,
-  transaction: EnrichedTransaction,
-) => {
-  try {
+export type WMNewTransactionInput = {
+  id?: string; // optional custom id
+  hash: string;
+  isSynced: boolean;
+  bankName: string | null;
+  type: 'CREDIT' | 'DEBIT' | null;
+  amount: number | null;
+  description: string | null;
+  transactionTime: number;
+  party: string | null;
+};
+
+export async function createWMTransaction(
+  data: WMNewTransactionInput,
+): Promise<Transaction> {
+  const existing = await database.collections
+    .get('transactions')
+    .query(Q.where('hash', data.hash))
+    .fetch();
+
+  if (existing.length === 0) {
+    let transaction: Transaction;
+
     await database.write(async () => {
-      const newTransaction = await database.collections
-        .get('transactions')
-        .create((record: any) => {
-          record.amount = transaction.amount;
-          record.createdAt = transaction.created_at;
-          record.description = transaction.description;
-          record.transactionTime = transaction.transaction_time;
-          record.type = transaction.type;
-          record.updatedAt = transaction.updated_at;
-          record.userId = transaction.user_id;
-          record.account = JSON.stringify(transaction.account);
-          record.category = JSON.stringify(transaction.category);
-        });
-
-      await database.collections.get('hashes').create((record: any) => {
-        record.hash = hash;
-        record.isSynced = false;
-        record.transactionId = newTransaction.id;
-        record.createdAt = new Date().toISOString();
+      const collection = database.collections.get<Transaction>('transactions');
+      transaction = await collection.create(t => {
+        if (data.id) {
+          t._raw.id = ; // optional custom id
+        }
+        t.hash = data.hash;
+        t.isSynced = data.isSynced;
+        t.bankName = data.bankName ?? '';
+        t.type = data.type ?? 'DEBIT';
+        t.amount = data.amount ?? 0;
+        t.description = data.description ?? null;
+        t.transactionTime = data.transactionTime;
+        t.party = data.party ?? '';
       });
     });
-    console.log('Transaction and hash saved successfully!');
-  } catch (error) {
-    console.error('Error saving transaction with hash:', error);
+
+    return transaction!;
+  } else {
+    console.log('Transaction Already Exists');
+    throw new Error('Transaction Already Exists');
   }
-};
-// export const getUnsyncedTransactions = async (): Promise<
-//   EnrichedTransaction[]
-// > => {
-//   try {
-//     const hashes = await database.collections.get('hashes').query().fetch();
-//     const unsynced = hashes.filter((hash: Hash) => !hash.isSynced);
-
-//     const transactions = await Promise.all(
-//       unsynced.map(async (hash: Hash) => {
-//         const transaction = await database.collections
-//           .get('transactions')
-//           .find(hash.transactionId);
-//         return {
-//           ...transaction._raw,
-//           account: JSON.parse(transaction.account),
-//           category: JSON.parse(transaction.category),
-//         };
-//       }),
-//     );
-
-//     return transactions;
-//   } catch (error) {
-//     console.error('Error fetching unsynced transactions:', error);
-//     return [];
-//   }
-// };
+}

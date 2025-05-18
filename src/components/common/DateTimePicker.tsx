@@ -42,13 +42,10 @@ const DateTimePickerComponent = forwardRef<DateTimePickerComponentProps>(
     const handleDateChange = (date: Date) => {
       const utcDate = dayjs(date).utc().toDate(); // Convert selected date to UTC
       if (isNow(utcDate)) {
-        console.log('It is Now Date');
         setIsNowSelected(true);
       } else {
-        console.log('Not a Now Date');
         setIsNowSelected(false);
       }
-      console.log('Handle Date Change', utcDate.toISOString());
       setSelectedDate(utcDate); // Callback when date changes
     };
     // Expose the method to get the actual date when submitting
@@ -56,7 +53,6 @@ const DateTimePickerComponent = forwardRef<DateTimePickerComponentProps>(
       getSelectedDate: () => {
         const date = isNowSelected ? new Date() : selectedDate;
 
-        console.log('date returned', date);
         return date;
       },
     }));

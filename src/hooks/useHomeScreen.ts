@@ -42,7 +42,6 @@ export const useHomeScreen = () => {
   const datePickerRef = useRef<{getSelectedDate: () => Date}>(null);
   const getSelectedDate = () => {
     const date = datePickerRef.current?.getSelectedDate();
-    console.log('Selected Date for Submission:', date);
     return date;
   };
   // Fetch categories, accounts, and transactions

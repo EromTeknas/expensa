@@ -67,7 +67,6 @@ export const fetchTransactionsByDate = async (
     date: specificDate,
   });
 
-  console.log('ByDate', specificDate, startOfDay, endOfDay);
   const {data, error} = await supabase
     .from('transactions')
     .select(
@@ -137,20 +136,16 @@ export const fetchTransactionSum = async (
     }[]
   >
 > => {
-  console.log('inside sum start');
   const sum = await supabase
     .from('transactions')
     .select('amount.sum()', {count: 'exact'}) // Proper aggregation
     .eq('user_id', userId)
     .gte('transaction_time', startDate);
-  console.log('sum', sum);
   return sum;
 };
 
 // Add a new transaction
 export const deleteTransaction = async (transactionId: number) => {
-  console.log('inside delete ransationc ', transactionId);
-
   const {error} = await supabase
     .from('transactions')
     .delete()

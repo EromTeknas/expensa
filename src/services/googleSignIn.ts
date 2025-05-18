@@ -11,7 +11,6 @@ export const signInWithGoogle = async () => {
   try {
     await GoogleSignin.hasPlayServices();
     const userInfo = await GoogleSignin.signIn();
-    console.log(userInfo);
 
     const idToken = userInfo.data?.idToken;
     const {data, error} = await supabase.auth.signInWithIdToken({
@@ -19,7 +18,6 @@ export const signInWithGoogle = async () => {
       token: idToken!,
     });
 
-    console.log(data);
 
     if (error) {
       console.log(error);

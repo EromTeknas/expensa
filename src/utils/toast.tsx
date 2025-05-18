@@ -25,7 +25,6 @@ const showToast = ({
 
   if (afterToastCallback) {
     setTimeout(() => {
-      console.log('Toast has disappeared');
       afterToastCallback(); // Call only if defined
     }, TOAST_TIMEOUT + 1000); // Match the visibilityTime
   }
