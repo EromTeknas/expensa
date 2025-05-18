@@ -1,6 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {
   createWMTransactions,
+  getTransactionsSinceEpoch,
   WMNewTransactionInput,
 } from '../../watermelon/services/transactionService';
 import {
@@ -9,33 +10,62 @@ import {
   EnrichedTransaction,
   fetchEnrichedTransactionsByIds,
   mapWMTransactionsToNewTransactions,
-} from 'src/models/transactions';
+} from '../../models/transactions';
+import delay from '../../utils/delay';
 
-export const addSyncTransactionsThunk = createAsyncThunk<
-  {
-    transactionsCreated: WMNewTransactionInput[];
-    transactionsSkipped: WMNewTransactionInput[];
-  },
+export const addAndGetAllSyncTransactionsSinceLastSyncThunk = createAsyncThunk<
   WMNewTransactionInput[],
+  {
+    syncTransactionsToCreate: WMNewTransactionInput[];
+    returnTransactionsSyncEpoch: number;
+  },
   {rejectValue: string}
 >(
   'syncTransactions/addSyncTransactionsSinceEpoch',
-  async (syncTransactionsToCreate, {rejectWithValue}) => {
-    const {created, skipped, error} = await createWMTransactions(
+  async (
+    {syncTransactionsToCreate, returnTransactionsSyncEpoch},
+    {rejectWithValue},
+  ) => {
+    await delay(5000);
+
+    const {error: createError} = await createWMTransactions(
       syncTransactionsToCreate,
+    );
+
+    if (createError) {
+      return rejectWithValue(createError.message);
+    }
+
+    const {data: wmTransactions, error} = await getTransactionsSinceEpoch(
+      returnTransactionsSyncEpoch,
     );
 
     if (error) {
       return rejectWithValue(error.message);
-    } else {
-      return {
-        transactionsCreated: created ?? [],
-        transactionsSkipped: skipped ?? [],
-      };
     }
+
+    return wmTransactions ?? [];
   },
 );
 
+export const getAllWMTransactionsSinceLastSyncEpochThunk = createAsyncThunk<
+  WMNewTransactionInput[],
+  number,
+  {rejectValue: string}
+>(
+  'syncTransactions/getAllWMTransactionsSinceLastSyncEpoch',
+  async (lastSyncEpoch, {rejectWithValue}) => {
+    const {data: wmTransactions, error} = await getTransactionsSinceEpoch(
+      lastSyncEpoch,
+    );
+
+    if (error) {
+      return rejectWithValue(error.message);
+    }
+
+    return wmTransactions ?? [];
+  },
+);
 // export const fetchAllSyncTransactionsSinceLastSyncDateThunk = createAsyncThunk<
 //   WMNewTransactionInput[],
 //   number,

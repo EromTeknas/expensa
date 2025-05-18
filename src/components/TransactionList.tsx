@@ -11,9 +11,9 @@ dayjs.extend(relativeTime);
 
 interface TransactionListProps {
   transactions: EnrichedTransaction[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onSelect: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onSelect: (id: string) => void;
 }
 
 const groupTransactionsByDate = (transactions: EnrichedTransaction[]) => {

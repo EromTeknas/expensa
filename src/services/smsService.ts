@@ -3,11 +3,10 @@ import parseTransaction from '../utils/parser';
 import {WMNewTransactionInput} from '../watermelon/services/transactionService';
 import getHash from '../utils/hash';
 
-
 // TODO
 // Handle the SMS Retreiver Failure
 export const getMessageSinceLastSyncDate = (
-  lastSyncDate: Date,
+  lastSyncDate: number,
 ): WMNewTransactionInput[] => {
   const filtersString = getFiltersJson(lastSyncDate);
   const listOfWpTransactions: WMNewTransactionInput[] = [];
@@ -49,10 +48,7 @@ export const getMessageSinceLastSyncDate = (
   return listOfWpTransactions;
 };
 
-const getFiltersJson = (lastSyncDate: Date) => {
-  console.log('Inside GetFilter', lastSyncDate);
-  const timestampInMs = lastSyncDate.getTime();
-  console.log('TIMESTAPM', timestampInMs);
+const getFiltersJson = (lastSyncDate: number) => {
   var filter = {
     box: 'inbox', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
 
@@ -65,7 +61,7 @@ const getFiltersJson = (lastSyncDate: Date) => {
      *    - Same for minDate but with "date >= minDate"
      */
     // minDate: new Date('2025-04-01T00:00:00Z').getTime(), // timestamp (in milliseconds since UNIX epoch)
-    minDate: timestampInMs,
+    minDate: lastSyncDate,
     //   maxDate: 1556277910456, // timestamp (in milliseconds since UNIX epoch)
     // bodyRegex: '(.*)How are you(.*)', // content regex to match
 

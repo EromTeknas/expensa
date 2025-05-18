@@ -1,16 +1,17 @@
 import {createSlice} from '@reduxjs/toolkit';
 import {WMNewTransactionInput} from 'src/watermelon/services/transactionService';
 import {
-  addSyncTransactionsThunk,
+  addAndGetAllSyncTransactionsSinceLastSyncThunk,
   syncTransactionsToSupabaseThunk,
 } from './syncTransactionsThunk';
-import {EnrichedTransaction} from 'src/models/transactions';
+import {EnrichedTransaction} from '../../models/transactions';
+import {SyncStatusType} from '../../components/common/SyncTransactionButton';
 
 // TODO
 // Change Naming Convention for function and state
 type SyncTransactionsScreenState = {
   isSyncing: boolean;
-  hasNewTransactions: boolean;
+  hasNewTransactions: SyncStatusType;
   lastSyncTransactionDate: Date | null;
   syncTransactions: {
     loading: boolean;
@@ -27,7 +28,7 @@ type SyncTransactionsScreenState = {
 
 const initialSyncTransactionsScreenState: SyncTransactionsScreenState = {
   isSyncing: false,
-  hasNewTransactions: false,
+  hasNewTransactions: SyncStatusType.SYNCING,
   lastSyncTransactionDate: null,
   syncTransactions: {
     loading: false,
@@ -62,36 +63,54 @@ const syncTransactionsSlice = createSlice({
     },
 
     hasNewTransactions: state => {
-      if (
-        state.isSyncing &&
-        state.syncTransactions.unsyncedTransactions.length === 0
-      ) {
-        state.hasNewTransactions = false;
+      if (state.isSyncing) {
+        console.log('isSyncing');
+        state.hasNewTransactions = SyncStatusType.SYNCING;
+      }
+      if (state.syncTransactions.unsyncedTransactions.length === 0) {
+        console.log('Nothing to Syncr');
+        state.hasNewTransactions = SyncStatusType.NOTHING_TO_SYNC;
       } else {
-        state.hasNewTransactions = true;
+        console.log('Transactions Available');
+        state.hasNewTransactions = SyncStatusType.TRANSACTIONS_AVAILABLE;
       }
     },
   },
   extraReducers: builder => {
     builder
-      .addCase(addSyncTransactionsThunk.pending, state => {
-        state.syncTransactions.loading = true;
-        state.isSyncing = true;
-      })
-      .addCase(addSyncTransactionsThunk.fulfilled, (state, action) => {
-        state.syncTransactions.unsyncedTransactions =
-          action.payload.transactionsCreated;
-        state.syncTransactions.skippedTransactions =
-          action.payload.transactionsSkipped;
-        state.syncTransactions.loading = false;
-        state.isSyncing = false;
-      })
-      .addCase(addSyncTransactionsThunk.rejected, (state, action) => {
-        state.syncTransactions.error =
-          action.error.message ?? 'Failed to Sync Transactions';
-        state.syncTransactions.loading = false;
-        state.isSyncing = false;
-      })
+      .addCase(
+        addAndGetAllSyncTransactionsSinceLastSyncThunk.pending,
+        state => {
+          state.syncTransactions.loading = true;
+          state.isSyncing = true;
+          state.hasNewTransactions = SyncStatusType.SYNCING;
+        },
+      )
+      .addCase(
+        addAndGetAllSyncTransactionsSinceLastSyncThunk.fulfilled,
+        (state, action) => {
+          state.syncTransactions.unsyncedTransactions = action.payload;
+          state.syncTransactions.loading = false;
+          state.isSyncing = false;
+          if (state.syncTransactions.unsyncedTransactions.length === 0) {
+            console.log('Nothing to Syncr');
+            state.hasNewTransactions = SyncStatusType.NOTHING_TO_SYNC;
+          } else {
+            console.log('Transactions Available');
+            state.hasNewTransactions = SyncStatusType.TRANSACTIONS_AVAILABLE;
+          }
+        },
+      )
+      .addCase(
+        addAndGetAllSyncTransactionsSinceLastSyncThunk.rejected,
+        (state, action) => {
+          state.syncTransactions.error =
+            action.error.message ?? 'Failed to Sync Transactions';
+          state.syncTransactions.loading = false;
+          state.isSyncing = false;
+          state.hasNewTransactions = SyncStatusType.SYNCING;
+        },
+      )
       .addCase(syncTransactionsToSupabaseThunk.pending, state => {
         state.syncTransactionsButtonState.loading = true;
       })

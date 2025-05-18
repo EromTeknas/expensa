@@ -150,6 +150,7 @@ export const fetchTransactionSumsThunk = createAsyncThunk<
   {rejectValue: string}
 >('home/fetchTransactionSums', async (userId, {rejectWithValue}) => {
   try {
+    console.log('Fetch Transactions Sum', userId);
     const {start: weekStart} = getStartAndEndOfDayInUTC({
       date: getStartDate('week'),
     });

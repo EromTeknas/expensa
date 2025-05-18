@@ -11,9 +11,12 @@ import {database} from '../watermelon/database';
 import {Q} from '@nozbe/watermelondb';
 import {checkAndRequestReadSMSPermission} from '../utils/checkAndRequestPermissions';
 import {getMessageSinceLastSyncDate} from '../services/smsService';
+import {useAppDispatch} from '../app/hooks';
+import {addAndGetAllSyncTransactionsSinceLastSyncThunk} from '../features/syncTransactions/syncTransactionsThunk';
 const Tab = createBottomTabNavigator<Record<RouteName, undefined>>();
 
 const BottomTabs = () => {
+  const dispatch = useAppDispatch();
   useEffect(() => {
     initializeDatabase().then(async () => {
       const permission = await checkAndRequestReadSMSPermission();
@@ -27,9 +30,16 @@ const BottomTabs = () => {
 
         if (settings.length > 0) {
           const setting = settings[0];
-          console.log('Setting', setting.lastSyncDate);
-          const lastSyncDateT = new Date(setting.lastSyncDate);
-          getMessageSinceLastSyncDate(lastSyncDateT);
+          const lastSyncDateT = setting.lastSyncDate;
+          const listOfWpTransactions =
+            getMessageSinceLastSyncDate(lastSyncDateT);
+
+          dispatch(
+            addAndGetAllSyncTransactionsSinceLastSyncThunk({
+              syncTransactionsToCreate: listOfWpTransactions,
+              returnTransactionsSyncEpoch: lastSyncDateT,
+            }),
+          );
         } else {
           // Handle case if settings are missing (though unlikely)
           console.log('Settings not found.');

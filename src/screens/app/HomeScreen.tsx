@@ -5,7 +5,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
 } from 'react-native';
 import GroupedExpensesList from '../../components/TransactionList';
 import {useHomeScreen} from '../../hooks/useHomeScreen';
@@ -19,13 +18,13 @@ import {
   CardTextIcon,
   ArrowUpRightIcon,
   ArrowDownLeftIcon,
-  GearIcon,
 } from '../../components/common/Icons';
 import DateTimePickerComponent from '../../components/common/DateTimePicker';
 import {FONTFAMILIES} from '../../constants/fonts';
-import LinearGradient from 'react-native-linear-gradient';
 import ROUTES from '../../constants/routes';
 import {ScreenProps} from '../../@types/navigation';
+import {useSyncTransactionsScreen} from '../../hooks/useSyncTransactionsScreen';
+import {SyncStatusButton} from '../../components/common/SyncTransactionButton';
 const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
   navigation,
 }) => {
@@ -50,7 +49,7 @@ const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
     transactions,
     datePickerRef,
   } = useHomeScreen();
-
+  const {isSyncing, hasNewTransactions} = useSyncTransactionsScreen();
   return (
     <KeyboardAvoidingView
       style={{flex: 1}}
@@ -67,18 +66,11 @@ const HomeScreen: React.FC<ScreenProps<typeof ROUTES.HOME>> = ({
           ) : (
             <></>
           )}
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate(ROUTES.SYNC_TRANSACTIONS);
-            }}>
-            <LinearGradient
-              colors={['#1D1D1D', '#262626']}
-              start={{x: 0, y: 0.5}}
-              end={{x: 1, y: 0.5}}
-              style={styles.iconButton}>
-              <GearIcon height={16} width={16} color={COLORS.grey[100]} />
-            </LinearGradient>
-          </TouchableOpacity>
+          <SyncStatusButton
+            loading={isSyncing}
+            type={hasNewTransactions}
+            onClick={() => navigation.navigate(ROUTES.SYNC_TRANSACTIONS)}
+          />
         </View>
         <View style={styles.addTransactionSection}>
           <View style={styles.addTransactionSectionHeader}>

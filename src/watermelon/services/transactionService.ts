@@ -14,12 +14,30 @@ export type WMNewTransactionInput = {
   category_id: string | null;
   account_id: string | null;
 };
+export const mapTransactionsToWMInputs = (
+  transactions: Transaction[],
+): WMNewTransactionInput[] => {
+  return transactions.map(t => ({
+    hash: t.hash,
+    isSynced: t.isSynced,
+    bankName: t.bankName ?? null,
+    type: t.type ?? null,
+    amount: t.amount ?? null,
+    description: t.description ?? null,
+    transactionTime:
+      typeof t.transactionTime === 'number'
+        ? t.transactionTime
+        : new Date(t.transactionTime).getTime(),
+    party: t.party ?? null,
+    category_id: t.categoryId ?? null,
+    account_id: t.accountId ?? null,
+  }));
+};
 
 export async function createWMTransactions(
   dataList: WMNewTransactionInput[],
 ): Promise<{
   created: WMNewTransactionInput[];
-  skipped: WMNewTransactionInput[];
   error: Error | null;
 }> {
   try {
@@ -32,7 +50,6 @@ export async function createWMTransactions(
     const existingHashSet = new Set(existingHashes.map(t => t.hash));
 
     const newDataList = dataList.filter(d => !existingHashSet.has(d.hash));
-    const skippedDataList = dataList.filter(d => existingHashSet.has(d.hash));
 
     await database.write(async () => {
       for (const data of newDataList) {
@@ -51,14 +68,12 @@ export async function createWMTransactions(
 
     return {
       created: newDataList,
-      skipped: skippedDataList,
       error: null,
     };
   } catch (error) {
     console.error('Failed to add transactions:', error);
     return {
       created: [],
-      skipped: [],
       error: error as Error,
     };
   }
@@ -99,7 +114,7 @@ export async function createWMTransaction(
 export async function getTransactionsSinceEpoch(
   lastSyncEpoch: number,
 ): Promise<{
-  data: Transaction[] | null;
+  data: WMNewTransactionInput[] | null;
   error: Error | null;
 }> {
   try {
@@ -107,8 +122,8 @@ export async function getTransactionsSinceEpoch(
       .get<Transaction>('transactions')
       .query(Q.where('transaction_time', Q.gt(lastSyncEpoch)))
       .fetch();
-
-    return {data: transactions, error: null};
+    const listOfWMTransaction = mapTransactionsToWMInputs(transactions);
+    return {data: listOfWMTransaction, error: null};
   } catch (error) {
     console.error('Failed to fetch transactions:', error);
     return {data: null, error: error as Error};

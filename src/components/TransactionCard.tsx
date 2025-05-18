@@ -17,10 +17,11 @@ const formatTo12HourTime = (timestamp: string): string => {
 };
 interface TransactionCardProps {
   transaction: EnrichedTransaction;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
-  onSelect: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onSelect: (id: string) => void;
 }
+
 
 const SWIPE_THRESHOLD_EDIT = 100;
 const SWIPE_THRESHOLD_DELETE = 100;

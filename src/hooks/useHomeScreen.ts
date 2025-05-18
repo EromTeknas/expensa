@@ -44,6 +44,7 @@ export const useHomeScreen = () => {
     const date = datePickerRef.current?.getSelectedDate();
     return date;
   };
+
   // Fetch categories, accounts, and transactions
   useEffect(() => {
     if (!user?.id) {
@@ -77,6 +78,7 @@ export const useHomeScreen = () => {
   useEffect(() => {
     setTransactions(transaction.transactions);
   }, [transaction.transactions]);
+
   const handleAddTransaction = async (
     transactionType: TransactionType,
     setLoading: React.Dispatch<React.SetStateAction<boolean>>,

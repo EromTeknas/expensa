@@ -18,12 +18,11 @@ export const signInWithGoogle = async () => {
       token: idToken!,
     });
 
-
     if (error) {
       console.log(error);
       throw error;
     }
-
+    console.log(data.user);
     return data.user;
   } catch (error: any) {
     console.log(error);
